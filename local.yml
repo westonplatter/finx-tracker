@@ -24,6 +24,26 @@ services:
       - "8000:8000"
     command: /start
 
+  django-cli:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: finx_tracker_local_django
+    container_name: finx_tracker_local_django
+    platform: linux/x86_64
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: python
+
+
   postgres:
     build:
       context: .
@@ -36,24 +56,7 @@ services:
     env_file:
       - ./.envs/.local/.postgres
     ports:
-      - "65432:5432"
-
-  # docs:
-  #   image: finx_tracker_local_docs
-  #   container_name: finx_tracker_local_docs
-  #   platform: linux/x86_64
-  #   build:
-  #     context: .
-  #     dockerfile: ./compose/local/docs/Dockerfile
-  #   env_file:
-  #     - ./.envs/.local/.django
-  #   volumes:
-  #     - ./docs:/docs:z
-  #     - ./config:/app/config:z
-  #     - ./finx_tracker:/app/finx_tracker:z
-  #   ports:
-  #     - "9000:9000"
-  #   command: /start-docs
+      - "5432:5432"
 
   redis:
     image: redis:6

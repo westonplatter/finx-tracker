@@ -80,7 +80,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "finx_tracker.users",
-    # Your stuff: custom apps go here
+    "finx_tracker.trades",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

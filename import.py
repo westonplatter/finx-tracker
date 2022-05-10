@@ -66,13 +66,13 @@ def transform_df(df):
 
 def persist_to_db(engine, df):
     with engine.connect() as con:
-        df.to_sql("trades", con=con, if_exists="replace", index=False)
+        df.to_sql("trades_trade", con=con, if_exists="replace", index=False)
 
 
 def main():
     df = fetch_from_disk()
     df = transform_df(df)
-    engine = create_engine("postgresql://debug:debug@127.0.0.1:65432/finx_tracker")
+    engine = create_engine("postgresql://debug:debug@127.0.0.1:5432/finx_tracker")
     persist_to_db(engine, df)
 
 

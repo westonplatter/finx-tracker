@@ -11,11 +11,7 @@ from django.urls import reverse
 from finx_tracker.users.forms import UserAdminChangeForm
 from finx_tracker.users.models import User
 from finx_tracker.users.tests.factories import UserFactory
-from finx_tracker.users.views import (
-    UserRedirectView,
-    UserUpdateView,
-    user_detail_view,
-)
+from finx_tracker.users.views import UserRedirectView, UserUpdateView, user_detail_view
 
 pytestmark = pytest.mark.django_db
 

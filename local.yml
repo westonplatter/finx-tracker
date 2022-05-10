@@ -35,23 +35,25 @@ services:
       - finx_tracker_local_postgres_data_backups:/backups:z
     env_file:
       - ./.envs/.local/.postgres
-
-  docs:
-    image: finx_tracker_local_docs
-    container_name: finx_tracker_local_docs
-    platform: linux/x86_64
-    build:
-      context: .
-      dockerfile: ./compose/local/docs/Dockerfile
-    env_file:
-      - ./.envs/.local/.django
-    volumes:
-      - ./docs:/docs:z
-      - ./config:/app/config:z
-      - ./finx_tracker:/app/finx_tracker:z
     ports:
-      - "9000:9000"
-    command: /start-docs
+      - "65432:5432"
+
+  # docs:
+  #   image: finx_tracker_local_docs
+  #   container_name: finx_tracker_local_docs
+  #   platform: linux/x86_64
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/docs/Dockerfile
+  #   env_file:
+  #     - ./.envs/.local/.django
+  #   volumes:
+  #     - ./docs:/docs:z
+  #     - ./config:/app/config:z
+  #     - ./finx_tracker:/app/finx_tracker:z
+  #   ports:
+  #     - "9000:9000"
+  #   command: /start-docs
 
   redis:
     image: redis:6
@@ -77,10 +79,10 @@ services:
     ports: []
     command: /start-celerybeat
 
-  flower:
-    <<: *django
-    image: finx_tracker_local_flower
-    container_name: finx_tracker_local_flower
-    ports:
-      - "5555:5555"
-    command: /start-flower
+  # flower:
+  #   <<: *django
+  #   image: finx_tracker_local_flower
+  #   container_name: finx_tracker_local_flower
+  #   ports:
+  #     - "5555:5555"
+  #   command: /start-flower

@@ -13,6 +13,14 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
 
 ## Basic Commands
 
+## DB operations
+### migrations
+
+```
+docker-compose -f local.yaml run django-cli python manage.py makemigrations [optional: app_name]
+docker-compose -f local.yaml run django-cli python manage.py migrate [optional: app_name]
+```
+
 ### Setting Up Your Users
 
 -   To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.

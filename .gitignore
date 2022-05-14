@@ -1,4 +1,5 @@
 data
+*.csv
 
 ### Python template
 # Byte-compiled / optimized / DLL files

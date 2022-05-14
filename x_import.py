@@ -8,6 +8,8 @@ import re
 import pandas as pd
 from sqlalchemy import create_engine
 
+# from finx_tracker.portfolios.models import Portfolio, Strategy
+
 
 def parse_datetime_series(raw_series: pd.Series) -> pd.Series:
     FORMAT = "%Y-%m-%d;%H%M%S"
@@ -68,12 +70,19 @@ def persist_to_db(engine, df):
     with engine.connect() as con:
         df.to_sql("trades_trade", con=con, if_exists="replace", index=False)
 
+# def update_portfolios(engine, df):
+#     account_ids = df['account_id'].unique()
+#     for aid in account_ids:
+#         port = Portfolio.objects.filter(account_id=aid).first()
+#         if port is None:
+#             port = Portfolio(account_id=aid)
 
 def main():
     df = fetch_from_disk()
     df = transform_df(df)
     engine = create_engine("postgresql://debug:debug@127.0.0.1:5432/finx_tracker")
     persist_to_db(engine, df)
+
 
 
 if __name__ == "__main__":

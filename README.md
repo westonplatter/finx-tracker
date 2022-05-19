@@ -17,8 +17,8 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
 ### migrations
 
 ```
-docker-compose -f local.yaml run django-cli python manage.py makemigrations [optional: app_name]
-docker-compose -f local.yaml run django-cli python manage.py migrate [optional: app_name]
+docker-compose -f local.yml run django-cli python manage.py makemigrations [optional: app_name]
+docker-compose -f local.yml run django-cli python manage.py migrate [optional: app_name]
 ```
 
 ### Setting Up Your Users

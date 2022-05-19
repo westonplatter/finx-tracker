@@ -1,5 +1,7 @@
 data
 *.csv
+.ipynb_checkpoints/
+*.ipynb
 
 ### Python template
 # Byte-compiled / optimized / DLL files

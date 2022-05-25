@@ -77,4 +77,4 @@ class Trade(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'trades_trade'
+        db_table = "trades_trade"

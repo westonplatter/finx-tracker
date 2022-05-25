@@ -3,7 +3,8 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy import create_engine
 
-from x_import import parse_date_series, parse_datetime_series
+from .common import gen_db_url
+from .import_trades import parse_date_series, parse_datetime_series
 
 CLOSE_OUT_COLUMN = "co_trade_id"
 CLOSE_OUT_COLUMN_VALUE = "trade_id"
@@ -104,9 +105,8 @@ def find_roll_id_for_conids_and_dt(xdf, conids, dt) -> pd.DataFrame:
     return qdf.head(1)
 
 
-def main():
-
-    engine = create_engine("postgresql://debug:debug@127.0.0.1:5432/finx_tracker")
+def run():
+    engine = create_engine(gen_db_url())
     sql = fetch_dates_sql()
 
     with engine.connect() as con:
@@ -186,7 +186,3 @@ def main():
             rolls_df.loc[parent_df.index, CLOSE_OUT_COLUMN] = closed_closing_order_id
             rolls_df.loc[g.index, "roll_id"] = roll_id
             print("Close  ", msg, roll_id)
-
-
-if __name__ == "__main__":
-    main()

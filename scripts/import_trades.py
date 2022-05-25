@@ -8,6 +8,8 @@ import re
 import pandas as pd
 from sqlalchemy import create_engine
 
+from .common import gen_db_url
+
 # from finx_tracker.portfolios.models import Portfolio, Strategy
 
 
@@ -86,13 +88,11 @@ def persist_portfolios_to_db(engine, df):
         pdf.to_sql("portfolios_portfolio", con=con, if_exists="replace", index=False)
 
 
-def main():
+def run():
+    db_url = gen_db_url()
+    engine = create_engine(db_url)
+
     df = fetch_from_disk()
     df = transform_df(df)
-    engine = create_engine("postgresql://debug:debug@127.0.0.1:5432/finx_tracker")
     persist_portfolios_to_db(engine, df)
     persist_to_db(engine, df)
-
-
-if __name__ == "__main__":
-    main()

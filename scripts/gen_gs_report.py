@@ -124,6 +124,11 @@ def run():
         df.expiry = pd.to_datetime(df.expiry)
 
     transform_set_strike(df)
+
+    import pytz
+    x = datetime(2022, 1, 1, tzinfo=pytz.utc)
+    df = df.query("@x <= date_time")
+
     df["strategy"] = None
     df.sort_values(["date_time"], ascending=True)
 
@@ -132,9 +137,7 @@ def run():
         df.loc[grouped.index, "strategy"] = strategy_key
         df.loc[grouped.index, "front"] = grouped.expiry.min()
 
-    rolls_df = (
-        df.query("underlying_symbol == 'ESM2'").query("strategy == 'roll'")
-    ).copy()
+    rolls_df = (df.query("strategy == 'roll'")).copy()
 
     rolls_df["roll_id"] = 0
     rolls_df[CLOSE_OUT_COLUMN] = 0
@@ -146,43 +149,77 @@ def run():
             msg.append(" ".join(values))
         return ", ".join(msg)
 
-    for k, g in rolls_df.groupby(["date_time"]):
-        if len(g.description.unique()) == 1:
-            continue
+    # for k, g in rolls_df.groupby(["date_time"]):
+    #     if len(g.description.unique()) == 1:
+    #         continue
 
-        opened = g.query("open_close_indicator == 'O'")
-        closed = g.query("open_close_indicator == 'C'")
+    #     opened = g.query("open_close_indicator == 'O'")
+    #     closed = g.query("open_close_indicator == 'C'")
 
-        columns = ["quantity", "description"]
-        m1 = "O = " + gen_msg(opened, columns)
-        m2 = "C = " + gen_msg(closed, columns)
-        msg = [m1, m2]
+    #     columns = ["quantity", "description"]
+    #     m1 = "O = " + gen_msg(opened, columns)
+    #     m2 = "C = " + gen_msg(closed, columns)
+    #     msg = [m1, m2]
 
-        open_close_set = set(g.open_close_indicator.unique())
+    #     open_close_set = set(g.open_close_indicator.unique())
 
-        if set(["O"]) == open_close_set:
-            roll_id = rolls_df["roll_id"].max() + 1
-            rolls_df.loc[g.index, "roll_id"] = roll_id
-            print("Open   ", msg, roll_id)
+    #     if set(["O"]) == open_close_set:
+    #         roll_id = rolls_df["roll_id"].max() + 1
+    #         rolls_df.loc[g.index, "roll_id"] = roll_id
+    #         print("Open   ", msg, roll_id)
 
-        if set(["C", "O"]) == open_close_set:
-            conids, dt = closed.conid.values, g.date_time.values[0]
-            parent_df = find_roll_id_for_conids_and_dt(rolls_df, conids, dt)
-            rolls_df.loc[parent_df.index, CLOSE_OUT_COLUMN] = closed[
-                CLOSE_OUT_COLUMN_VALUE
-            ].values[0]
-            roll_id = parent_df["roll_id"].values[0]
-            rolls_df.loc[g.index, "roll_id"] = roll_id
-            print("Roll   ", msg, " ", roll_id)
+    #     if set(["C", "O"]) == open_close_set:
+    #         conids, dt = closed.conid.values, g.date_time.values[0]
+    #         parent_df = find_roll_id_for_conids_and_dt(rolls_df, conids, dt)
+    #         rolls_df.loc[parent_df.index, CLOSE_OUT_COLUMN] = closed[
+    #             CLOSE_OUT_COLUMN_VALUE
+    #         ].values[0]
+    #         roll_ids = parent_df["roll_id"].values
+    #         if len(roll_ids) == 0:
+    #             roll_id = rolls_df["roll_id"].max() + 1
+    #         else:
+    #             roll_ids[0]
 
-        if set(["C"]) == open_close_set:
-            conids, dt = closed.conid.values, g.date_time.values[0]
-            parent_df = find_roll_id_for_conids_and_dt(rolls_df, conids, dt)
-            parent_conid = parent_df.conid.values[0]
-            roll_id = parent_df["roll_id"].values[0]
-            closed_closing_order_id = closed.query("conid == @parent_conid")[
-                CLOSE_OUT_COLUMN_VALUE
-            ].values[0]
-            rolls_df.loc[parent_df.index, CLOSE_OUT_COLUMN] = closed_closing_order_id
-            rolls_df.loc[g.index, "roll_id"] = roll_id
-            print("Close  ", msg, roll_id)
+    #         rolls_df.loc[g.index, "roll_id"] = roll_id
+    #         print("Roll   ", msg, " ", roll_id)
+
+    #     if set(["C"]) == open_close_set:
+    #         conids, dt = closed.conid.values, g.date_time.values[0]
+    #         parent_df = find_roll_id_for_conids_and_dt(rolls_df, conids, dt)
+    #         try:
+    #             parent_conid = parent_df.conid.values[0]
+    #             roll_id = parent_df["roll_id"].values[0]
+    #             closed_closing_order_id = closed.query("conid == @parent_conid")[
+    #                 CLOSE_OUT_COLUMN_VALUE
+    #             ].values[0]
+    #             rolls_df.loc[parent_df.index, CLOSE_OUT_COLUMN] = closed_closing_order_id
+    #             rolls_df.loc[g.index, "roll_id"] = roll_id
+    #             print("Close  ", msg, roll_id)
+    #         except:
+    #             print('Help on row', g)
+
+    for k, grouped in df.groupby([df.date_time]):
+        strategy_key = classify_strategy(grouped)
+        df.loc[grouped.index, "strategy"] = strategy_key
+        df.loc[grouped.index, "front"] = grouped.expiry.min()
+
+        print("-------------------")
+        print(grouped.description)
+        cat = grouped.asset_category.unique()
+        print(strategy_key)
+
+        underlying = list(set([x.split(" ")[0] for x in grouped.description.values]))
+
+        if cat == ["FOP"] and underlying == "CL":
+            suggestion = "roll_cl"
+        else:
+            suggestion = "None"
+
+        print(suggestion)
+
+        # val = input("Enter your value: ")
+        # print(val)
+
+        # import pdb; pdb.set_trace()
+
+

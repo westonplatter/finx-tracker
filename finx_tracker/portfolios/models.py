@@ -33,4 +33,4 @@ class StrategyTrade(models.Model):
 
     strategy = ForeignKey(to=Strategy, on_delete=on_delete_callable)
     ext_trade_id = models.BigIntegerField(unique=True, default=-1)
-    grouping_id = models.IntegerField(unique=True, default=-1)
+    group_name = models.CharField(max_length=500, blank=True, null=True)

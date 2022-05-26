@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 
 from .common import gen_db_url
 from .import_trades import parse_date_series, parse_datetime_series
+from finx_tracker.portfolios.models import StrategyTrade
 
 CLOSE_OUT_COLUMN = "co_trade_id"
 CLOSE_OUT_COLUMN_VALUE = "trade_id"
@@ -123,6 +124,22 @@ def run():
         strategy_key = classify_strategy(grouped)
         df.loc[grouped.index, "strategy"] = strategy_key
         df.loc[grouped.index, "front"] = grouped.expiry.min()
+
+    for idx, row in df.iterrows():
+        trade_id = row.trade_id
+        st = StrategyTrade.objects.filter(ext_trade_id=trade_id).first()
+
+        if st is None:
+            st = StrategyTrade(ext_trade_id=row.trade_id, group_name=row.front)
+            if row.strategy == "gs_a":
+                st.strategy_id = 1
+            if row.strategy == "gs_b":
+                st.strategy_id = 2
+            st.save()
+
+    # select t.trade_id, st.id
+    # from trades_trade as t
+    # left outer join portfolios_strategy_trade as st on st.ext_trade_id = t.trade_id
 
     tdf = df.pivot_table(
         values=["fifo_pnl_realized"],

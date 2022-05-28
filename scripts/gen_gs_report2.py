@@ -3,9 +3,10 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy import create_engine
 
+from finx_tracker.portfolios.models import StrategyTrade
+
 from .common import gen_db_url
 from .import_trades import parse_date_series, parse_datetime_series
-from finx_tracker.portfolios.models import StrategyTrade
 
 CLOSE_OUT_COLUMN = "co_trade_id"
 CLOSE_OUT_COLUMN_VALUE = "trade_id"
@@ -120,12 +121,12 @@ def run():
     df["strategy"] = None
     df.sort_values(["date_time"], ascending=True)
 
-    for k, grouped in df.groupby([df.date_time]):
+    for _, grouped in df.groupby([df.date_time]):
         strategy_key = classify_strategy(grouped)
         df.loc[grouped.index, "strategy"] = strategy_key
         df.loc[grouped.index, "front"] = grouped.expiry.min()
 
-    for idx, row in df.iterrows():
+    for _, row in df.iterrows():
         trade_id = row.trade_id
         st = StrategyTrade.objects.filter(ext_trade_id=trade_id).first()
 
@@ -136,6 +137,7 @@ def run():
             if row.strategy == "gs_b":
                 st.strategy_id = 2
             st.save()
+            print(f"adding row to gs classification\n{row}")
 
     # select t.trade_id, st.id
     # from trades_trade as t
@@ -145,8 +147,9 @@ def run():
         values=["fifo_pnl_realized"],
         index=["front"],
         columns=["strategy"],
-        aggfunc=["count", "sum"])
+        aggfunc=["count", "sum"],
+    )
 
     print(tdf)
-
-    tdf.to_csv("gs.csv")
+    print(tdf.sum())
+    print(f"Total = {tdf.sum().sum():0.2f}")

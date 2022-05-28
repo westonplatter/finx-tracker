@@ -8,8 +8,11 @@ import re
 import pandas as pd
 from sqlalchemy import create_engine
 
+from finx_tracker.portfolios.models import Portfolio
+
 from .common import gen_db_url
-from finx_tracker.portfolios.models import StrategyTrade
+
+TRADES_TABLE_NAME = "trades_trade"
 
 
 def parse_datetime_series(raw_series: pd.Series) -> pd.Series:
@@ -67,18 +70,28 @@ def transform_df(df):
     return df
 
 
-def persist_to_db(engine, df):
+def remove_existing_trades(engine, df) -> pd.DataFrame:
+    query = f"select trade_id from {TRADES_TABLE_NAME}"
     with engine.connect() as con:
-        df.to_sql("trades_trade", con=con, if_exists="replace", index=False)
+        existing_df = pd.read_sql(query, con=con)
+        existing_trade_ids = existing_df.trade_id.unique()
+    new_df = df[~df.trade_id.isin(existing_trade_ids)].copy()
+    return new_df
+
+
+def append_to_table(engine, df, table_name):
+    with engine.connect() as con:
+        df.to_sql(table_name, con=con, if_exists="append", index=False)
 
 
 def persist_portfolios_to_db(df):
-    account_ids = df['account_id'].unique()
+    account_ids = df["account_id"].unique()
     for aid in account_ids:
         port = Portfolio.objects.filter(account_id=aid).first()
         if port is None:
             port = Portfolio(account_id=aid)
             port.save()
+
 
 def run():
     db_url = gen_db_url()
@@ -86,4 +99,5 @@ def run():
     df = fetch_from_disk()
     df = transform_df(df)
     persist_portfolios_to_db(df)
-    persist_to_db(engine, df)
+    new_df = remove_existing_trades(engine, df)
+    append_to_table(engine, new_df, TRADES_TABLE_NAME)

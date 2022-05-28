@@ -126,6 +126,7 @@ def run():
     transform_set_strike(df)
 
     import pytz
+
     x = datetime(2022, 1, 1, tzinfo=pytz.utc)
     df = df.query("@x <= date_time")
 
@@ -221,5 +222,3 @@ def run():
         # print(val)
 
         # import pdb; pdb.set_trace()
-
-

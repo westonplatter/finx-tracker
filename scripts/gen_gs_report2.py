@@ -22,7 +22,7 @@ def fetch_gs_dates_sql():
         where date_time is not null
             and t.underlying_symbol = 'ESM2'
         group by date_time
-            having count(*) >= 4
+        having count(*) >= 4
         order by date_time desc
     )
 
@@ -38,10 +38,6 @@ def transform_set_strike(df):
     xdf = df[df.asset_category.isin(["OPT", "FOP"])]
     df.loc[xdf.index, "strike"] = xdf["description"].str.split(" ", expand=True)[2]
     return None
-
-
-def _count_descriptions(descriptions: pd.Series):
-    return descriptions.count()
 
 
 def is_gs_a(grouped_df):
@@ -68,8 +64,6 @@ def is_gs_b(grouped_df):
     front_date = grouped_df.expiry.min()
     back_date = grouped_df.expiry.max()
     dte_diff = (front_date - back_date).days
-
-    print(strikes_count, dte_diff, front_date.weekday(), back_date.weekday())
 
     # short put/call diagonal with 2 strike diff
     # Front = Friday

@@ -1,41 +1,73 @@
 # finx-tracker
+Web app focused on tracking PnL for options/futures focused portfolios.
 
-finx tracker
+Success for the codebase, 
+(1) code is does few things well
+(2) keep it simple and direct - add comments if there's complexity or cleverness
 
-[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
-[![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+## License
+BSD-v3. See license file
 
-License: BSD
+## Personal notes 
 
-## Settings
+### Importing trades
+docker-compose -f local.yml run django-cli python manage.py runscript import_trades
 
-Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
+## Getting started
+Run this, 
+```
+```
 
-## Basic Commands
 
-## DB operations
-### migrations
 
+## History Dump 
+
+9328  dc -f local up
+9336  dc -f local.yml up
+9341  dc -f local.yml setup.cfg
+9378  dc -f local.yml down
+9406  dc -f local.yml postgres
+9410  dc -f local.yml build
+9411  dc -f local.yml run django-cli python --version
+9412  dc -f local.yml run django-cli python manage.py 
+9413  dc -f local.yml run django-cli python manage.py dbshell
+9414  dc -f local.yml run django-cli python manage.py startapp trades trades
+9415  dc -f local.yml run django-cli python manage.py startapp --help
+9416  dc -f local.yml run django-cli python manage.py startapp trades finx_tracker
+9417  dc -f local.yml run django-cli python manage.py startapp trades
+9418  dc -f local.yml run django-cli python manage.py inspectdb
+9421  dc -f local.yml run django-cli python manage.py --help
+9422  dc -f local.yml run django-cli python manage.py makemigrateions trades
+9423  dc -f local.yml run django-cli python manage.py reset_db
+9424  dc -f local.yml run django-cli python manage.py migrate trades
+9425  dc -f local.yml run django-cli python manage.py makemigrations trades
+9427  dc -f local.yml run django-cli python manage.py shell
+9437  dc -f local.yml run django-cli python manage.py startapp portfolios
+9443  dc -f local.yml run django-cli python manage.py makemigrations 
+9483  dc -f local.yml up postgres
+9543  dc -f local.yml up -d postgres
+9550  dc build
+9552  dc -f local.yml run django-cli python manage.py runscript import_trades
+9553  dc -f local.yml run django-cli python manage.py runscript gen_gs_trades
+9554  dc -f local.yml run django-cli python manage.py runscript gen_gs_report
+9555  dc -f local.yml run django-cli python manage.py runscript -v 2gen_gs_report 
+9556  dc -f local.yml run django-cli python manage.py runscript -v2 gen_gs_report 
+9591  dc  ps
+9592  dc -f local.yml run django-cli python manage.py runscript -v2 x_import.py
+9593  dc -f local.yml run django-cli python manage.py runscript -v2 gen_gs_report
+9594  dc -f local.yml run django-cli python manage.py makemigrations
+9595  dc -f local.yml run django-cli python manage.py migrate
+9603  dc -f local.yml run django-cli python manage.py runscript -v2 import_trades
+9604  dc -f local.yml run django-cli python manage.py runscript -v2 gen_gs_trades2
+9605  dc -f local.yml run django-cli python manage.py runscript -v2 gen_gs_report2
+9611  dc -f local.yml stop  
+
+
+## DB / Migrations 
 ```
 docker-compose -f local.yml run django-cli python manage.py makemigrations [optional: app_name]
 docker-compose -f local.yml run django-cli python manage.py migrate [optional: app_name]
 ```
-
-### Setting Up Your Users
-
--   To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
-
--   To create a **superuser account**, use this command:
-
-        $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-### Type checks
-
-Running type checks with mypy:
-
-    $ mypy finx_tracker
 
 ### Test coverage
 
@@ -45,31 +77,3 @@ To run the tests, check your test coverage, and generate an HTML coverage report
     $ coverage html
     $ open htmlcov/index.html
 
-#### Running tests with pytest
-
-    $ pytest
-
-### Live reloading and Sass CSS compilation
-
-Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html#sass-compilation-live-reloading).
-
-### Celery
-
-This app comes with Celery.
-
-To run a celery worker:
-
-``` bash
-cd finx_tracker
-celery -A config.celery_app worker -l info
-```
-
-Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
-
-## Deployment
-
-The following details how to deploy this application.
-
-### Docker
-
-See detailed [cookiecutter-django Docker documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).

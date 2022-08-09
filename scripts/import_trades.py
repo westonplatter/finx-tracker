@@ -1,18 +1,23 @@
 #
 # end goal: import trades from finx-ib-report csv files for strategy
-# categorization and booking. Success is simple code that does few
-# things well.
+# categorization and booking.
 #
+# Success is simple code that does few things well.
+#
+import glob
+import os
 import re
+from typing import List
 
 import pandas as pd
 from sqlalchemy import create_engine
 
 from finx_tracker.portfolios.models import Portfolio
+from finx_tracker.trades.models import Trade
 
 from .common import gen_db_url
 
-TRADES_TABLE_NAME = "trades_trade"
+TRADES_TABLE_NAME = Trade._meta.db_table
 
 
 def parse_datetime_series(raw_series: pd.Series) -> pd.Series:
@@ -30,10 +35,11 @@ def parse_date_series(raw_series: pd.Series) -> pd.Series:
     return series
 
 
-def fetch_from_disk():
-    fn = "./data/my_trades.csv"
-    df = pd.read_csv(fn)
-    return df
+def fetch_files_from_disk() -> List:
+    path = os.getcwd()
+    csv_files = glob.glob(os.path.join(path, "data", "*.csv"))
+    csv_files = [x for x in csv_files if ("close" not in x and "trades" in x)]
+    return csv_files
 
 
 def transform_snake_case_names(df):
@@ -96,8 +102,9 @@ def persist_portfolios_to_db(df):
 def run():
     db_url = gen_db_url()
     engine = create_engine(db_url)
-    df = fetch_from_disk()
-    df = transform_df(df)
-    persist_portfolios_to_db(df)
-    new_df = remove_existing_trades(engine, df)
-    append_to_table(engine, new_df, TRADES_TABLE_NAME)
+    for file in fetch_files_from_disk():
+        df = pd.read_csv(file)
+        df = transform_df(df)
+        persist_portfolios_to_db(df)
+        new_df = remove_existing_trades(engine, df)
+        append_to_table(engine, new_df, TRADES_TABLE_NAME)

@@ -14,8 +14,13 @@ BSD-v3. See license file
 docker-compose -f local.yml run django-cli python manage.py runscript import_trades
 
 ## Getting started
-Run this, 
+Run this,
 ```
+docker-compose build
+make db.migrate
+# run this, cd ../finx-ib-reports && make download.annual && finx-tracker
+make import.trades
+make 
 ```
 
 

@@ -20,9 +20,9 @@ def fetch_gs_dates_sql():
             date_time
         from trades_trade as t
         where date_time is not null
-            and t.underlying_symbol = 'ESM2'
+            and t.underlying_symbol in ('ESM2', 'ESU2')
         group by date_time
-        having count(*) >= 4
+        having count(*) >= 2
         order by date_time desc
     )
 
@@ -41,6 +41,7 @@ def transform_set_strike(df):
 
 
 def is_gs_a(grouped_df):
+    options_count = len(grouped_df.description.unique())
     strikes_count = len(grouped_df.strike.unique())
 
     front_date = grouped_df.expiry.min()
@@ -51,7 +52,8 @@ def is_gs_a(grouped_df):
     # Front = Friday
     # Back = Monday
     return (
-        strikes_count == 1
+        options_count == 4
+        and strikes_count == 1
         and dte_diff == -3
         and front_date.weekday() == 4
         and back_date.weekday() == 0
@@ -59,6 +61,7 @@ def is_gs_a(grouped_df):
 
 
 def is_gs_b(grouped_df):
+    options_count = len(grouped_df.description.unique())
     strikes_count = len(grouped_df.strike.unique())
 
     front_date = grouped_df.expiry.min()
@@ -69,18 +72,61 @@ def is_gs_b(grouped_df):
     # Front = Friday
     # Back = Monday
     return (
-        strikes_count == 3
+        options_count == 4
+        and strikes_count == 3
+        and dte_diff == -3
+        and front_date.weekday() == 4
+        and back_date.weekday() == 0
+    )
+
+def is_gs_v2(grouped_df):
+    options_count = len(grouped_df.description.unique())
+    strikes_count = len(grouped_df.strike.unique())
+
+    front_date = grouped_df.expiry.min()
+    back_date = grouped_df.expiry.max()
+    dte_diff = (front_date - back_date).days
+
+    # short put/call calendar at same strike
+    # Front = Friday
+    # Back = Monday
+    return (
+        options_count == 2
+        and strikes_count == 1
         and dte_diff == -3
         and front_date.weekday() == 4
         and back_date.weekday() == 0
     )
 
 
+def is_gs_v3(grouped_df):
+    options_count = len(grouped_df.description.unique())
+    strikes_count = len(grouped_df.strike.unique())
+
+    front_date = grouped_df.expiry.min()
+    back_date = grouped_df.expiry.max()
+    dte_diff = (front_date - back_date).days
+
+    # short put/call calendar at same strike
+    # Front = Friday
+    # Back = Monday
+    return (
+        options_count == 2
+        and strikes_count == 1
+        and dte_diff == -4
+        and front_date.weekday() == 0
+        and back_date.weekday() == 4
+    )
+
 def classify_strategy(grouped_df):
     if is_gs_a(grouped_df):
         return "gs_a"
     if is_gs_b(grouped_df):
         return "gs_b"
+    if is_gs_v2(grouped_df):
+        return "gs_v2"
+    if is_gs_v3(grouped_df):
+        return "gs_v3"
     return "not automatically tagged"
 
 
@@ -93,6 +139,18 @@ def find_roll_id_for_conids_and_dt(xdf, conids, dt) -> pd.DataFrame:
     return qdf.head(1)
 
 
+def get_strategy_id_for_strategy(engine, strategy_key: str, account_id: str) -> int:
+    query = f"""
+        select ps.id
+        from portfolios_strategy as ps
+        join portfolios_portfolio as pp on pp.id = ps.portfolio_id
+        where
+            ps.name = '{strategy_key}'
+            and pp.account_id = '{account_id}'
+    """
+    return pd.read_sql(query, engine).id.iloc[0]
+
+
 def run():
     engine = create_engine(gen_db_url())
     sql = fetch_gs_dates_sql()
@@ -101,7 +159,7 @@ def run():
         dates_df = pd.read_sql_query(sql, con=con).reset_index()
 
         sql = """
-            select * from trades_trade
+        select * from trades_trade
         """
         trades_df = pd.read_sql_query(sql, con=con)
 
@@ -115,7 +173,7 @@ def run():
     df["strategy"] = None
     df.sort_values(["date_time"], ascending=True)
 
-    for _, grouped in df.groupby([df.date_time]):
+    for _, grouped in df.groupby([df.account_id, df.date_time]):
         strategy_key = classify_strategy(grouped)
         df.loc[grouped.index, "strategy"] = strategy_key
         df.loc[grouped.index, "front"] = grouped.expiry.min()
@@ -126,12 +184,13 @@ def run():
 
         if st is None:
             st = StrategyTrade(ext_trade_id=row.trade_id, group_name=row.front)
-            if row.strategy == "gs_a":
-                st.strategy_id = 1
-            if row.strategy == "gs_b":
-                st.strategy_id = 2
-            st.save()
-            print(f"adding row to gs classification\n{row}")
+            try:
+                st.strategy_id = get_strategy_id_for_strategy(engine, row.strategy, row.account_id)
+                st.save()
+            except Exception as e:
+                print(f"for {row.account_id}, cannot find strategy id for {row.strategy}")
+                print(e)
+
 
     # select t.trade_id, st.id
     # from trades_trade as t
@@ -139,7 +198,7 @@ def run():
 
     tdf = df.pivot_table(
         values=["fifo_pnl_realized"],
-        index=["front"],
+        index=["front", "account_id"],
         columns=["strategy"],
         aggfunc=["count", "sum"],
     )

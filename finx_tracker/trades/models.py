@@ -2,6 +2,9 @@ from django.db import models
 
 
 class Trade(models.Model):
+    class Meta:
+        managed = False
+        db_table = "trades_trade"
     account_id = models.TextField(blank=True, null=True)
     acct_alias = models.FloatField(blank=True, null=True)
     model = models.FloatField(blank=True, null=True)
@@ -74,7 +77,3 @@ class Trade(models.Model):
     trader_id = models.FloatField(blank=True, null=True)
     is_api_order = models.TextField(blank=True, null=True)
     accrued_int = models.BigIntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = "trades_trade"

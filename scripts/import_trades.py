@@ -6,7 +6,6 @@
 #
 import glob
 import os
-import re
 from typing import List
 
 import pandas as pd
@@ -15,7 +14,12 @@ from sqlalchemy import create_engine
 from finx_tracker.portfolios.models import Portfolio
 from finx_tracker.trades.models import Trade
 
-from .common import gen_db_url, parse_date_series, parse_datetime_series, transform_snake_case_names
+from .common import (
+    gen_db_url,
+    parse_date_series,
+    parse_datetime_series,
+    transform_snake_case_names,
+)
 
 TRADES_TABLE_NAME = Trade._meta.db_table
 

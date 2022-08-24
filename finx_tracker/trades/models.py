@@ -5,6 +5,7 @@ class Trade(models.Model):
     class Meta:
         managed = False
         db_table = "trades_trade"
+
     account_id = models.TextField(blank=True, null=True)
     acct_alias = models.FloatField(blank=True, null=True)
     model = models.FloatField(blank=True, null=True)

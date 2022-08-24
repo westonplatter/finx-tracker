@@ -1,14 +1,10 @@
-from datetime import datetime
 from os import environ
 from typing import List, Optional
 
 import pandas as pd
 from sqlalchemy import create_engine
 
-from finx_tracker.portfolios.models import StrategyTrade
-
 from .common import gen_db_url
-from .import_trades import parse_date_series, parse_datetime_series
 
 CLOSE_OUT_COLUMN = "co_trade_id"
 CLOSE_OUT_COLUMN_VALUE = "trade_id"
@@ -90,6 +86,7 @@ def is_gs_b(grouped_df):
         and back_date.weekday() == 0
     )
 
+
 def is_gs_v2(grouped_df):
     options_count = len(grouped_df.description.unique())
     strikes_count = len(grouped_df.strike.unique())
@@ -129,6 +126,7 @@ def is_gs_v3(grouped_df):
         and back_date.weekday() == 4
     )
 
+
 def classify_strategy(grouped_df):
     if is_gs_a(grouped_df):
         return "gs_a"
@@ -140,29 +138,31 @@ def classify_strategy(grouped_df):
         return "gs_v3"
     return "not automatically tagged"
 
+
 def is_rolling_trade(df: pd.DataFrame) -> bool:
-    return (
-        ("O" in df['open_close_indicator'].values)
-        and ("C" in df['open_close_indicator'].values)
+    return ("O" in df["open_close_indicator"].values) and (
+        "C" in df["open_close_indicator"].values
     )
 
 
-def find_roll_id_for_conids_and_dt(df: pd.DataFrame, conids: List, dt: pd.Timestamp) -> pd.DataFrame:
-    df = (df
-        .query("conid.isin(@conids)")
+def find_roll_id_for_conids_and_dt(
+    df: pd.DataFrame, conids: List, dt: pd.Timestamp
+) -> pd.DataFrame:
+    df = (
+        df.query("conid.isin(@conids)")
         .query("date_time < @dt")
         .query("open_close_indicator == ")
         .query(f"{CLOSE_OUT_COLUMN} == 0")
     )
     return df.head(1)
 
+
 def find_opening_trade_fifo(opening_trades, conid, dt) -> pd.DataFrame:
     return opening_trades[
-        (opening_trades['conid'] == conid)
+        (opening_trades["conid"] == conid)
         & (opening_trades.date_time < dt)
         & (opening_trades[CLOSE_OUT_COLUMN] == 0)
     ].head(1)
-
 
 
 def get_strategy_id_for_strategy(engine, strategy_key: str, account_id: str) -> int:
@@ -192,7 +192,11 @@ def run():
 
         # get trades
         if len(account_ids) > 0:
-            account_ids_predicate = f"account_id IN {tuple(account_ids)}" if len(account_ids) > 1 else f"account_id = '{account_ids[0]}'"
+            account_ids_predicate = (
+                f"account_id IN {tuple(account_ids)}"
+                if len(account_ids) > 1
+                else f"account_id = '{account_ids[0]}'"
+            )
             query = f"select * from trades_trade where {account_ids_predicate}"
         else:
             query = "select * from trades_trade"
@@ -215,22 +219,27 @@ def run():
 
     for ix, row in df.iterrows():
         # only closing trades
-        if row.open_close_indicator == 'O':
+        if row.open_close_indicator == "O":
             continue
-        single_opening_trade = find_opening_trade_fifo(opening_trades, row.conid, row.date_time)
+        single_opening_trade = find_opening_trade_fifo(
+            opening_trades, row.conid, row.date_time
+        )
         if len(single_opening_trade.index) >= 1:
             if len(single_opening_trade.index) > 1:
-                import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
             else:
                 co_trade_id = single_opening_trade["trade_id"].values[0]
                 df.loc[ix, CLOSE_OUT_COLUMN] = co_trade_id
-
 
         # strategy_key = classify_strategy(grouped)
         # df.loc[grouped.index, "strategy"] = strategy_key
         # df.loc[grouped.index, "front"] = grouped.expiry.min()
 
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
 
     # for _, row in df.iterrows():
     #     trade_id = row.trade_id
@@ -244,7 +253,6 @@ def run():
     #         except Exception as e:
     #             print(f"for {row.account_id}, cannot find strategy id for {row.strategy}")
     #             print(e)
-
 
     # select t.trade_id, st.id
     # from trades_trade as t

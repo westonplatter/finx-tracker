@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 from django.db import connection
 
 
@@ -35,4 +36,4 @@ def agg_query_strategy_pnl():
     """
     with connection.cursor() as cursor:
         cursor.execute(query)
-        return namedtuple_fetchall(cursor=cursor, tuple_name='AggQueryStrategyPnl')
+        return namedtuple_fetchall(cursor=cursor, tuple_name="AggQueryStrategyPnl")

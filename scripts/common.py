@@ -1,6 +1,8 @@
+import re
+
 import environ
 import pandas as pd
-import re
+
 
 def gen_db_url():
     env = environ.Env()
@@ -30,7 +32,7 @@ def parse_datetime_series(raw_series: pd.Series) -> pd.Series:
         return series
     except ValueError:
         FORMAT = "%Y-%m-%d %H:%M:%S%z"
-        series = pd.to_datetime(raw_series, errors='raise', format=FORMAT, utc=True)
+        series = pd.to_datetime(raw_series, errors="raise", format=FORMAT, utc=True)
         series = series.dt.tz_convert(tz="US/Eastern")
         return series
 

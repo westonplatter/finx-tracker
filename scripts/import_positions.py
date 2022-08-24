@@ -1,6 +1,5 @@
 import glob
 import os
-import re
 from typing import List
 
 import pandas as pd
@@ -8,8 +7,12 @@ from sqlalchemy import create_engine
 
 from finx_tracker.portfolios.models import Portfolio, Position
 
-from .common import gen_db_url, parse_date_series, parse_datetime_series, transform_snake_case_names
-
+from .common import (
+    gen_db_url,
+    parse_date_series,
+    parse_datetime_series,
+    transform_snake_case_names,
+)
 
 POSITIONS_TABLE_NAME = Position._meta.db_table
 
@@ -44,7 +47,7 @@ def transform_df(df):
 def truncate_and_append_to_table(engine, df, table_name):
     with engine.connect() as con:
         con.execute(f"TRUNCATE {POSITIONS_TABLE_NAME}; ")
-        df.to_sql(table_name, con=con, if_exists='append', index=False)
+        df.to_sql(table_name, con=con, if_exists="append", index=False)
 
 
 def persist_portfolios_to_db(df):

@@ -1,9 +1,3 @@
-#
-# end goal: import trades from finx-ib-report csv files for strategy
-# categorization and booking.
-#
-# Success is simple code that does few things well.
-#
 import glob
 import os
 from typing import List
@@ -11,8 +5,7 @@ from typing import List
 import pandas as pd
 from sqlalchemy import create_engine
 
-from finx_tracker.portfolios.models import Portfolio
-from finx_tracker.trades.models import Trade
+from finx_tracker.portfolios.models import Portfolio, Position
 
 from .common import (
     gen_db_url,
@@ -21,13 +14,12 @@ from .common import (
     transform_snake_case_names,
 )
 
-TRADES_TABLE_NAME = Trade._meta.db_table
+POSITIONS_TABLE_NAME = Position._meta.db_table
 
 
 def fetch_files_from_disk() -> List:
     path = os.getcwd()
-    csv_files = glob.glob(os.path.join(path, "data", "*.csv"))
-    csv_files = [x for x in csv_files if ("close" not in x and "trades" in x)]
+    csv_files = glob.glob(os.path.join(path, "data", "*_open_positions.csv"))
     return csv_files
 
 
@@ -52,17 +44,9 @@ def transform_df(df):
     return df
 
 
-def remove_existing_trades(engine, df) -> pd.DataFrame:
-    query = f"select trade_id from {TRADES_TABLE_NAME}"
+def truncate_and_append_to_table(engine, df, table_name):
     with engine.connect() as con:
-        existing_df = pd.read_sql(query, con=con)
-        existing_trade_ids = existing_df.trade_id.unique()
-    new_df = df[~df.trade_id.isin(existing_trade_ids)].copy()
-    return new_df
-
-
-def append_to_table(engine, df, table_name):
-    with engine.connect() as con:
+        con.execute(f"TRUNCATE {POSITIONS_TABLE_NAME}; ")
         df.to_sql(table_name, con=con, if_exists="append", index=False)
 
 
@@ -80,7 +64,6 @@ def run():
     engine = create_engine(db_url)
     for file in fetch_files_from_disk():
         df = pd.read_csv(file)
-        df = transform_df(df)
+        transform_df(df)
         persist_portfolios_to_db(df)
-        new_df = remove_existing_trades(engine, df)
-        append_to_table(engine, new_df, TRADES_TABLE_NAME)
+        truncate_and_append_to_table(engine, df, POSITIONS_TABLE_NAME)

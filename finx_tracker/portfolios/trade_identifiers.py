@@ -1,7 +1,5 @@
 from typing import List, Set
 
-import pandas as pd
-
 STATIC_PUT_CALL_SET = set(["P", "C"])
 STATIC_CALL_SET = set(["C"])
 STATIC_PUT_SET = set(["P"])
@@ -73,5 +71,4 @@ def is_diagonal(strikes: List = [], expiries: List = []):
 class OptionStrategyIdentifier(object):
     @classmethod
     def classify_df(cls, df):
-        strikes = df["strike"].unique()
-        expiries = df["expiry"].unique()
+        pass

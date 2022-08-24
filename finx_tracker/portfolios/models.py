@@ -23,7 +23,7 @@ class Strategy(models.Model):
         db_table = "portfolios_strategy"
 
     portfolio = ForeignKey(to=Portfolio, on_delete=on_delete_callable)
-    name = models.CharField(max_length=50, blank=False, null=False, default="Unnamed")
+    key = models.CharField(max_length=50, blank=False, null=False, default="Unnamed")
     description = models.CharField(max_length=500, blank=True, null=True)
 
 class Grouping(models.Model):

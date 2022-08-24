@@ -13,7 +13,7 @@ def agg_query_strategy_pnl():
 
     query = """
         select
-            ps.name AS strategy_name
+            ps.key AS strategy_key
             , ps.description AS strategy_description
             , pg.id AS portfolio_group_id
             , pg.name AS grouping_name
@@ -30,7 +30,7 @@ def agg_query_strategy_pnl():
         left outer join portfolios_position as pp on pp.originating_transaction_id = t.transaction_id
         group by
             pg.id
-            , ps.name
+            , ps.key
             , ps.description
     """
     with connection.cursor() as cursor:

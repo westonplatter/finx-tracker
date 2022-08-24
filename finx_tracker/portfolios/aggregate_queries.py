@@ -2,10 +2,9 @@ from collections import namedtuple
 from django.db import connection
 
 
-def namedtuplefetchall(cursor, tuple_name: str):
+def namedtuple_fetchall(cursor, tuple_name: str):
     "Return all rows from a cursor as a namedtuple"
-    desc = cursor.description
-    nt_result = namedtuple(tuple_name, [col[0] for col in desc])
+    nt_result = namedtuple(tuple_name, [col[0] for col in cursor.description])
     return [nt_result(*row) for row in cursor.fetchall()]
 
 
@@ -36,4 +35,4 @@ def agg_query_strategy_pnl():
     """
     with connection.cursor() as cursor:
         cursor.execute(query)
-        return namedtuplefetchall(cursor=cursor, tuple_name='AggQueryStrategyPnl')
+        return namedtuple_fetchall(cursor=cursor, tuple_name='AggQueryStrategyPnl')

@@ -13,7 +13,7 @@ This codebase aims to
 ### Getting started
 Run this,
 ```
-docker-compose build
+docker-compose -f local.yml build
 make db.migrate
 # run this, cd ../finx-ib-reports && make download.annual && finx-tracker
 make import.trades

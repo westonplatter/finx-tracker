@@ -14,7 +14,8 @@ def agg_query_strategy_pnl():
 
     query = """
         select
-            ps.key AS strategy_key
+            p.account_id AS account_id
+            , ps.key AS strategy_key
             , ps.description AS strategy_description
             , pg.id AS portfolio_group_id
             , pg.name AS grouping_name
@@ -28,9 +29,12 @@ def agg_query_strategy_pnl():
         join trades_trade as t on t.trade_id = pgt.ext_trade_id
         join portfolios_grouping as pg on pgt.group_id = pg.id
         join portfolios_strategy as ps on pg.strategy_id = ps.id
+        join portfolios_portfolio as p on p.id = ps.portfolio_id
         left outer join portfolios_position as pp on pp.originating_transaction_id = t.transaction_id
+
         group by
-            pg.id
+            p.account_id
+            , pg.id
             , ps.key
             , ps.description
     """

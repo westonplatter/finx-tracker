@@ -3,7 +3,7 @@ from django.urls import path
 from finx_tracker.portfolios.views import (
     portfolio_detail_view,
     portfolio_list_view,
-    portfolio_pnl_view
+    portfolio_pnl_view,
 )
 
 app_name = "portfolios"

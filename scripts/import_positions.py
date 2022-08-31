@@ -44,10 +44,14 @@ def transform_df(df):
     return df
 
 
-def truncate_and_append_to_table(engine, df, table_name):
+def append_to_table(engine, df, table_name):
+    with engine.connect() as con:
+        df.to_sql(table_name, con=con, if_exists="append", index=False)
+
+
+def truncate_table(engine):
     with engine.connect() as con:
         con.execute(f"TRUNCATE {POSITIONS_TABLE_NAME}; ")
-        df.to_sql(table_name, con=con, if_exists="append", index=False)
 
 
 def persist_portfolios_to_db(df):
@@ -62,8 +66,9 @@ def persist_portfolios_to_db(df):
 def run():
     db_url = gen_db_url()
     engine = create_engine(db_url)
+    truncate_table(engine)
     for file in fetch_files_from_disk():
         df = pd.read_csv(file)
         transform_df(df)
         persist_portfolios_to_db(df)
-        truncate_and_append_to_table(engine, df, POSITIONS_TABLE_NAME)
+        append_to_table(engine, df, POSITIONS_TABLE_NAME)

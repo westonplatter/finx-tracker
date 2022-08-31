@@ -37,6 +37,11 @@ def agg_query_strategy_pnl():
             , pg.id
             , ps.key
             , ps.description
+
+        order by
+            p.account_id
+            , ps.key
+            , pg.id
     """
     with connection.cursor() as cursor:
         cursor.execute(query)

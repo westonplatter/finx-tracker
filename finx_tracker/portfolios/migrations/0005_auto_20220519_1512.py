@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('ext_trade_id', models.IntegerField(default=-1, unique=True)),
                 ('grouping_id', models.IntegerField(default=-1, unique=True)),
-                ('strategy', models.ForeignKey(on_delete=finx_tracker.portfolios.models.on_delete_callable, to='portfolios.strategy')),
+                ('strategy', models.ForeignKey(on_delete=models.DO_NOTHING, to='portfolios.strategy')),
             ],
             options={
                 'db_table': 'portfolios_strategy_trade',

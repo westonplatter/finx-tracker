@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load trade_extras %}
+
+{% block content %}
+
+<h1>Trades</h2>
+
+
+
+<table class="table">
+  <tr>
+    <th>ID</th>
+    <th>Datetime</th>
+    <th>Account Id</th>
+    <th>Description</th>
+    <th>Grouping Name</th>
+  </tr>
+
+  {% for trade in object_list %}
+  <tr>
+    <td>{{ trade.id }}</td>
+    <td>{{ trade.date_time }}</td>
+    <td>{{ trade.account_id }}</td>
+    <td>{{ trade.description }}</td>
+    <td>{{ trade.groupings | render_grouping_names }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+{%endblock %}

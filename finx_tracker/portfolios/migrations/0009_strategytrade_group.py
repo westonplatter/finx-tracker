@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='strategytrade',
             name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=finx_tracker.portfolios.models.on_delete_callable, to='portfolios.group'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.DO_NOTHING, to='portfolios.group'),
         ),
     ]

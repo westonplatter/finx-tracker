@@ -6,6 +6,7 @@ from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.models import Portfolio
+from finx_tracker.trades.models import Trade
 
 
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
@@ -35,3 +36,15 @@ class PortfolioPnlView(LoginRequiredMixin, ListView):
 
 
 portfolio_pnl_view = PortfolioPnlView.as_view()
+
+
+class TradeListView(LoginRequiredMixin, ListView):
+    model = Trade
+    template_name = "portfolios/trade_list.html"
+    paginate_by = 50
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.prefetch_related("groupings").order_by("-date_time")
+
+trade_list_view = TradeListView.as_view()

@@ -2,10 +2,7 @@ from django.db import models
 from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 
-
-# TODO(weston) delete portfolio when a strategy is deleted
-def on_delete_callable(*args, **kwargs):
-    return None
+from finx_tracker.trades.models import Trade
 
 
 class Portfolio(models.Model):
@@ -22,7 +19,7 @@ class Strategy(models.Model):
         managed = True
         db_table = "portfolios_strategy"
 
-    portfolio = ForeignKey(to=Portfolio, on_delete=on_delete_callable)
+    portfolio = ForeignKey(to=Portfolio, on_delete=models.CASCADE)
     key = models.CharField(max_length=50, blank=False, null=False, default="Unnamed")
     description = models.CharField(max_length=500, blank=True, null=True)
 
@@ -39,11 +36,13 @@ class Grouping(models.Model):
 
     name = models.CharField(max_length=50, blank=False, null=False, default="Unnamed")
     strategy = ForeignKey(
-        to=Strategy, on_delete=on_delete_callable, null=True, blank=True
+        to=Strategy, on_delete=models.CASCADE, null=True, blank=True
     )
     status = models.CharField(
         max_length=16, choices=GroupingStatuses.choices, default=GroupingStatuses.ACTIVE
     )
+
+    trades = models.ManyToManyField(to='trades.Trade', through="portfolios.GroupingTrade")
 
 
 class GroupingTrade(models.Model):
@@ -51,15 +50,15 @@ class GroupingTrade(models.Model):
         managed = True
         db_table = "portfolios_grouping_trade"
 
-    ext_trade_id = models.BigIntegerField(unique=True, default=-1)
-    group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=on_delete_callable)
+    trade = ForeignKey(null=True, blank=True, to='trades.Trade', to_field='trade_id', on_delete=models.CASCADE)
+    group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=models.CASCADE)
 
 
 class Position(models.Model):
     class Meta:
         db_table = "portfolios_position"
 
-    portfolio = ForeignKey(to=Portfolio, on_delete=on_delete_callable)
+    portfolio = ForeignKey(to=Portfolio, on_delete=models.CASCADE)
     conid = models.IntegerField(blank=False, null=False)
     quantity = models.IntegerField(blank=False, null=False)
     closing_value = models.FloatField(blank=True, null=True)

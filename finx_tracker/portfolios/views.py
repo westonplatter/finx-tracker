@@ -1,16 +1,15 @@
 from typing import Any, Dict, List
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F, Sum, Window
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView
-from django.db.models import F, Sum, Window
-
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
-from finx_tracker.portfolios.models import Portfolio, Grouping
 from finx_tracker.portfolios.forms import TradeForm
+from finx_tracker.portfolios.models import Grouping, Portfolio
 from finx_tracker.trades.models import Trade
-
 
 
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
@@ -48,13 +47,13 @@ class TradeListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return (super()
-            .get_queryset()
-            .prefetch_related("groupings")
-            .order_by("-date_time")
+        return (
+            super().get_queryset().prefetch_related("groupings").order_by("-date_time")
         )
 
+
 trade_list_view = TradeListView.as_view()
+
 
 class TradeUpdateView(LoginRequiredMixin, UpdateView):
     model = Trade
@@ -73,6 +72,7 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
         qs = Grouping.objects.filter(strategy__portfolio__account_id=account_id)
         return qs.values("id")
 
+
 trade_update_view = TradeUpdateView.as_view()
 
 
@@ -83,10 +83,14 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
-        trade_list = (Trade.objects
-            .prefetch_related("groupings")
+        trade_list = (
+            Trade.objects.prefetch_related("groupings")
             .filter(groupings=self.object)
-            .annotate(fifo_pnl_realized_cumsum=Window(Sum('fifo_pnl_realized'), order_by=F('date_time').asc()))
+            .annotate(
+                fifo_pnl_realized_cumsum=Window(
+                    Sum("fifo_pnl_realized"), order_by=F("date_time").asc()
+                )
+            )
             .all()
             .order_by("-date_time")
         )
@@ -94,5 +98,6 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         context_data["trade_list"] = trade_list
 
         return context_data
+
 
 grouping_detail_view = GroupingDetailView.as_view()

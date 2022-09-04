@@ -35,14 +35,14 @@ class Grouping(models.Model):
         CLOSED_NEW_OPENS = "closed_new_opens", _("Closed to new opening trades")
 
     name = models.CharField(max_length=50, blank=False, null=False, default="Unnamed")
-    strategy = ForeignKey(
-        to=Strategy, on_delete=models.CASCADE, null=True, blank=True
-    )
+    strategy = ForeignKey(to=Strategy, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(
         max_length=16, choices=GroupingStatuses.choices, default=GroupingStatuses.ACTIVE
     )
 
-    trades = models.ManyToManyField(to='trades.Trade', through="portfolios.GroupingTrade")
+    trades = models.ManyToManyField(
+        to="trades.Trade", through="portfolios.GroupingTrade"
+    )
 
 
 class GroupingTrade(models.Model):
@@ -50,7 +50,13 @@ class GroupingTrade(models.Model):
         managed = True
         db_table = "portfolios_grouping_trade"
 
-    trade = ForeignKey(null=True, blank=True, to='trades.Trade', to_field='trade_id', on_delete=models.CASCADE)
+    trade = ForeignKey(
+        null=True,
+        blank=True,
+        to="trades.Trade",
+        to_field="trade_id",
+        on_delete=models.CASCADE,
+    )
     group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=models.CASCADE)
 
 

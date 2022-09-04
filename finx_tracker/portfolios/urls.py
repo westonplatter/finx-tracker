@@ -1,12 +1,12 @@
 from django.urls import path
 
 from finx_tracker.portfolios.views import (
+    grouping_detail_view,
     portfolio_detail_view,
     portfolio_list_view,
     portfolio_pnl_view,
     trade_list_view,
     trade_update_view,
-    grouping_detail_view,
 )
 
 app_name = "portfolios"

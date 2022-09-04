@@ -1,8 +1,8 @@
 from collections import namedtuple
 from typing import List
 
-from django.db import connection
 import sqlalchemy as sa
+from django.db import connection
 
 
 def namedtuple_fetchall(cursor, tuple_name: str):

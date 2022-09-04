@@ -1,5 +1,7 @@
 from collections import namedtuple
+from typing import List
 
+import sqlalchemy as sa
 from django.db import connection
 
 
@@ -17,7 +19,7 @@ def agg_query_strategy_pnl():
             p.account_id AS account_id
             , ps.key AS strategy_key
             , ps.description AS strategy_description
-            , pg.id AS portfolio_group_id
+            , pg.id AS grouping_id
             , pg.name AS grouping_name
             , pg.status AS grouping_status
             , sum(t.fifo_pnl_realized) AS realized_pnl
@@ -26,7 +28,7 @@ def agg_query_strategy_pnl():
             -- TODO(weston) calc how drastic the Syn Straggle - Rolling / Gamma Hedged gap is
 
         from portfolios_grouping_trade as pgt
-        join trades_trade as t on t.trade_id = pgt.ext_trade_id
+        join trades_trade as t on t.trade_id = pgt.trade_id
         join portfolios_grouping as pg on pgt.group_id = pg.id
         join portfolios_strategy as ps on pg.strategy_id = ps.id
         join portfolios_portfolio as p on p.id = ps.portfolio_id
@@ -37,6 +39,11 @@ def agg_query_strategy_pnl():
             , pg.id
             , ps.key
             , ps.description
+
+        order by
+            p.account_id
+            , ps.key
+            , pg.id
     """
     with connection.cursor() as cursor:
         cursor.execute(query)

@@ -1,9 +1,11 @@
 from django.db import models
 
+# from finx_tracker.portfolios.models import Grouping
+
 
 class Trade(models.Model):
     class Meta:
-        managed = False
+        managed = True
         db_table = "trades_trade"
 
     account_id = models.TextField(blank=True, null=True)
@@ -28,7 +30,9 @@ class Trade(models.Model):
     multiplier = models.BigIntegerField(blank=True, null=True)
     strike = models.FloatField(blank=True, null=True)
     expiry = models.TextField(blank=True, null=True)
-    trade_id = models.BigIntegerField(blank=True, null=True)
+    trade_id = models.BigIntegerField(
+        blank=True, null=True, unique=True
+    )  # unique so we get a 1:1 join in GroupingTrade
     put_call = models.TextField(blank=True, null=True)
     report_date = models.DateField(blank=True, null=True)
     principal_adjust_factor = models.FloatField(blank=True, null=True)
@@ -78,3 +82,7 @@ class Trade(models.Model):
     trader_id = models.FloatField(blank=True, null=True)
     is_api_order = models.TextField(blank=True, null=True)
     accrued_int = models.BigIntegerField(blank=True, null=True)
+
+    groupings = models.ManyToManyField(
+        to="portfolios.Grouping", through="portfolios.GroupingTrade"
+    )

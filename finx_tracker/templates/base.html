@@ -53,13 +53,22 @@
               <li class="nav-item active">
                 <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
               </li>
-              <li class="nav-item">
+              {% comment %} <li class="nav-item">
                 <a class="nav-link" href="{% url 'about' %}">About</a>
-              </li>
+              </li> {% endcomment %}
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
                   {# URL provided by django-allauth/account/urls.py #}
-                  <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% translate "My Profile" %}</a>
+                  <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% translate "Profile" %}</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'portfolios:portfolios-list' %}">{% translate "Portfolios" %}</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'portfolios:portfolios-pnl' %}">{% translate "PnL" %}</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'portfolios:trades-list' %}">{% translate "Trades" %}</a>
                 </li>
                 <li class="nav-item">
                   {# URL provided by django-allauth/account/urls.py #}

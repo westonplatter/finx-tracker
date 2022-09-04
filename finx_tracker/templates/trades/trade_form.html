@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% load trade_extras %}
+
+{% block content %}
+
+  <h1>Trade {{ object.trade_id }}</h1>
+
+  <p>
+    <ul>
+      <li>Account Id: {{ object.account_id }}</li>
+      <li>Description: {{ object.description }}</li>
+      <li>Open/Close: {{ object.open_close_indicator }}</li>
+    </ul>
+  </p>
+
+  <form method="post">{% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Update">
+  </form>
+
+{% endblock %}

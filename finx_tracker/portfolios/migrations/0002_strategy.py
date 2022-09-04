@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('acct_alias', models.FloatField(blank=True, null=True)),
-                ('portfolio', models.ForeignKey(on_delete=finx_tracker.portfolios.models.on_delete_callable, to='portfolios.portfolio')),
+                ('portfolio', models.ForeignKey(on_delete=models.DO_NOTHING, to='portfolios.portfolio')),
             ],
             options={
                 'db_table': 'portfolios_strategy',

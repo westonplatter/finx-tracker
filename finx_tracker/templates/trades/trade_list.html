@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load trade_extras %}
+
+{% block content %}
+
+<h1>Trades</h1>
+
+
+
+<table class="table">
+  <tr>
+    <th></th>
+
+    <th>Account Id</th>
+    <th>Description</th>
+    <th>Grouping Name</th>
+    <th>Datetime</th>
+  </tr>
+
+  {% for trade in object_list %}
+  <tr>
+    <td><a href="{% url 'portfolios:trade-update' trade.trade_id  %}">Detail</a></td>
+
+    <td>{{ trade.account_id }}</td>
+    <td>{{ trade.description }}</td>
+    <td>{{ trade.groupings | render_grouping_names }}</td>
+    <td>{{ trade.date_time }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+{% endblock %}

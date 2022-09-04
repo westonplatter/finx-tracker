@@ -11,7 +11,6 @@ from finx_tracker.portfolios.forms import TradeForm
 from finx_tracker.portfolios.models import Grouping, Portfolio
 from finx_tracker.trades.models import Trade
 
-
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
     # https://docs.djangoproject.com/en/4.1/ref/class-based-views/generic-display/#detailview
     model = Portfolio

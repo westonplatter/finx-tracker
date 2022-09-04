@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='trade',
-            options={'managed': True},
-        ),
+        # migrations.AlterModelOptions(
+        #     name='trade',
+        #     options={'managed': True},
+        # ),
     ]

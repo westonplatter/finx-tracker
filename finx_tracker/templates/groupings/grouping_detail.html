@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% load humanize %}
+{% load trade_extras %}
+
+{% block content %}
+
+<h1>Grouping {{object.name}} </h1>
+<p>Strategy: {{object.strategy.key}}/{{object.strategy.description}}</p>
+
+
+<br/>
+
+<h3>Trades</h3>
+<table class="table">
+  <tr>
+    <th></th> {% comment %} detail {% endcomment %}
+
+    <th>Description</th>
+    <th>Datetime</th>
+    <th>Realized PnL</th>
+    <th>Realized PnL Cumulative</th>
+    <th>O/C</th>
+  </tr>
+
+  {% for trade in trade_list %}
+  <tr>
+    <td><a href="{% url 'portfolios:trade-update' trade.trade_id  %}">Detail</a></td>
+
+    <td>{{ trade.description }}</td>
+    <td>{{ trade.date_time }}</td>
+    <td>{{ trade.fifo_pnl_realized|floatformat:2|intcomma }}</td>
+    <td>{{ trade.fifo_pnl_realized_cumsum|floatformat:2|intcomma }}</td>
+    <td>{{ trade.open_close_indicator }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+{% endblock %}

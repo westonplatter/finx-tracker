@@ -8,7 +8,6 @@
     <th>AccountId</th>
     <th>Strat Key</th>
     <th>Strat Desc</th>
-    <th>G Id</th>
     <th>G Name</th>
     <th>G Status</th>
     <th>G Realized PnL</th>
@@ -21,8 +20,7 @@
     <td>{{ row.account_id }}</td>
     <td>{{ row.strategy_key }}</td>
     <td>{{ row.strategy_description }}</td>
-    <td>{{ row.portfolio_group_id }}</td>
-    <td>{{ row.grouping_name }}</td>
+    <td><a href="{% url 'portfolios:grouping-detail' row.grouping_id %}">{{ row.grouping_name }}</a></td>
     <td>{{ row.grouping_status }}</td>
     <td>{{ row.realized_pnl }}</td>
     <td>{{ row.unrealized_pnl }}</td>

@@ -47,18 +47,8 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v3
 
-      - run: docker-compose -f local.yml pull
-
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
-
       - name: Build the Stack
         run:  docker-compose -f local.yml build
-
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
 
       - name: Run DB Migrations
         run:  docker-compose -f local.yml run --rm django python manage.py migrate

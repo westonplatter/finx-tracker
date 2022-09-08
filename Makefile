@@ -8,11 +8,11 @@ docker.up.django:
 	docker-compose -f local.yml up django
 
 import.positions:
-	# cp ../finx-ib-reports/data/*_open_positions.csv data
+	cp ../finx-reports-ib/data/*_open_positions.csv data
 	docker-compose -f local.yml run django-cli python manage.py runscript import_positions
 
 import.trades:
-	cp ../finx-ib-reports/data/*_trades.csv data
+	cp ../finx-reports-ib/data/*_trades.csv data
 	docker-compose -f local.yml run django-cli python manage.py runscript import_trades
 
 db.migrate:

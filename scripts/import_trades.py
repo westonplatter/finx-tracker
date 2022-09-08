@@ -41,7 +41,17 @@ def transform_datetime_columns(df):
 
 
 def transform_drop_columns(df):
-    df.drop(columns=["unnamed: 0"], inplace=True)
+    cols = [
+        "unnamed: 0",
+        "serial_number",
+        "delivery_type",
+        "commodity_type",
+        "fineness",
+        "weight",
+    ]
+    for col in cols:
+        if col in df.columns:
+            df.drop(columns=[col], inplace=True)
     return df
 
 

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load humanize %}
+
 {% block content %}
 <h1>Pnl</h2>
 
@@ -12,7 +14,9 @@
     <th>G Status</th>
     <th>G Realized PnL</th>
     <th>G Unrealized PnL</th>
+    <th>G Total Pnl</th>
     <th>G Position Value</th>
+
   </tr>
 
   {% for row in object_list %}
@@ -22,9 +26,10 @@
     <td>{{ row.strategy_description }}</td>
     <td><a href="{% url 'portfolios:grouping-detail' row.grouping_id %}">{{ row.grouping_name }}</a></td>
     <td>{{ row.grouping_status }}</td>
-    <td>{{ row.realized_pnl }}</td>
-    <td>{{ row.unrealized_pnl }}</td>
-    <td>{{ row.position_value }}</td>
+    <td>{{ row.realized_pnl |floatformat:2|intcomma }}</td>
+    <td>{{ row.unrealized_pnl |floatformat:2|intcomma }}</td>
+    <td>{{ row.total_pnl |floatformat:2|intcomma}}</td>
+    <td>{{ row.position_value |floatformat:2|intcomma}}</td>
   </tr>
   {% endfor %}
 </table>

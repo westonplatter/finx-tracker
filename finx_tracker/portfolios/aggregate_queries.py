@@ -25,6 +25,7 @@ def agg_query_strategy_pnl():
             , sum(t.fifo_pnl_realized) AS realized_pnl
             , sum(pp.fifo_pnl_unrealized) AS unrealized_pnl
             , sum(pp.position_value) AS position_value
+            , sum(t.fifo_pnl_realized) + sum(pp.fifo_pnl_unrealized) AS total_pnl
             -- TODO(weston) calc how drastic the Syn Straggle - Rolling / Gamma Hedged gap is
 
         from portfolios_grouping_trade as pgt

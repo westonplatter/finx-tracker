@@ -9,7 +9,26 @@
 <h1>Grouping {{object.name}} </h1>
 <p>Strategy: {{object.strategy.key}}/{{object.strategy.description}}</p>
 
+<br/>
 
+<h3>Positions</h3>
+<table class="table">
+  <tr>
+    <th>Conid</th>
+    <th>Description</th>
+    <th>PnL Unrealized</th>
+  </tr>
+
+  {% for position in position_list %}
+  <tr>
+    <td>{{ position.conid }}</td>
+    <td>{{ position.description }}</td>
+    <td>{{ position.fifo_pnl_unrealized }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<br/>
 <br/>
 
 <h3>Trades</h3>

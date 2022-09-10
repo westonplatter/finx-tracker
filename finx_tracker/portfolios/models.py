@@ -63,8 +63,21 @@ class GroupingTrade(models.Model):
 class Position(models.Model):
     class Meta:
         db_table = "portfolios_position"
+        managed = False
 
     portfolio = ForeignKey(to=Portfolio, on_delete=models.CASCADE)
+
+    account_id = models.TextField(blank=True, null=True)
+    symbol = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     conid = models.IntegerField(blank=False, null=False)
-    quantity = models.IntegerField(blank=False, null=False)
-    closing_value = models.FloatField(blank=True, null=True)
+
+    position = models.IntegerField(blank=True, null=True)
+    mark_value = models.FloatField(blank=True, null=True)
+    mark_value = models.FloatField(blank=True, null=True)
+    open_price = models.FloatField(blank=True, null=True)
+    cost_basis = models.FloatField(blank=True, null=True)
+    cost_basis_money = models.FloatField(blank=True, null=True)
+    fifo_pnl_unrealized = models.FloatField(blank=True, null=True)
+
+    originating_transaction_id = models.IntegerField(blank=False, null=False)

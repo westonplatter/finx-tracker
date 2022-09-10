@@ -1,18 +1,18 @@
 from typing import Any, Dict, List, T
 
+import django_filters.views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Sum, Window
 from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView
-import django_filters.views
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
+from finx_tracker.portfolios.filters import TradeListFilterSet
 from finx_tracker.portfolios.forms import TradeForm
 from finx_tracker.portfolios.models import Grouping, Portfolio, Position
 from finx_tracker.trades.models import Trade
-from finx_tracker.portfolios.filters import TradeListFilterSet
 
 
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
@@ -44,9 +44,10 @@ class TradeListView(LoginRequiredMixin, django_filters.views.FilterView):
 
     def get_queryset(self) -> QuerySet[T]:
         qs = super().get_queryset()  # to work with django-filters
-        qs = qs.filter() # TODO qs = qs.filter(user=self.request.user)
+        qs = qs.filter()  # TODO qs = qs.filter(user=self.request.user)
         qs = qs.prefetch_related("groupings")
         return qs
+
 
 class TradeUpdateView(LoginRequiredMixin, UpdateView):
     model = Trade

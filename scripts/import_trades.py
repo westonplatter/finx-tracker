@@ -33,9 +33,7 @@ def fetch_files_from_disk() -> List:
 
 def transform_datetime_columns(df):
     df["open_date_time"] = parse_datetime_series(df["open_date_time"])
-    df["holding_period_date_time"] = parse_datetime_series(
-        df["holding_period_date_time"]
-    )
+    df["holding_period_date_time"] = parse_datetime_series(df["holding_period_date_time"])
     df["report_date"] = parse_date_series(df["report_date"])
     return df
 

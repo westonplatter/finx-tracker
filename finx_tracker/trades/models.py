@@ -83,6 +83,4 @@ class Trade(models.Model):
     is_api_order = models.TextField(blank=True, null=True)
     accrued_int = models.BigIntegerField(blank=True, null=True)
 
-    groupings = models.ManyToManyField(
-        to="portfolios.Grouping", through="portfolios.GroupingTrade"
-    )
+    groupings = models.ManyToManyField(to="portfolios.Grouping", through="portfolios.GroupingTrade")

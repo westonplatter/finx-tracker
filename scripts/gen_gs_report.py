@@ -53,10 +53,7 @@ def is_gs_a(grouped_df):
     # Front = Friday
     # Back = Monday
     return (
-        descriptions_unique == 1
-        and dte_diff == -3
-        and front_date.weekday() == 4
-        and back_date.weekday() == 0
+        descriptions_unique == 1 and dte_diff == -3 and front_date.weekday() == 4 and back_date.weekday() == 0
     )
 
 
@@ -71,10 +68,7 @@ def is_gs_b(grouped_df):
     # Front = Friday
     # Back = Monday
     return (
-        descriptions_unique == 3
-        and dte_diff == -3
-        and front_date.weekday() == 4
-        and back_date.weekday() == 0
+        descriptions_unique == 3 and dte_diff == -3 and front_date.weekday() == 4 and back_date.weekday() == 0
     )
 
 
@@ -97,11 +91,7 @@ def classify_strategy(grouped_df):
 
 
 def find_roll_id_for_conids_and_dt(xdf, conids, dt) -> pd.DataFrame:
-    qdf = (
-        xdf.query("conid.isin(@conids)")
-        .query("date_time < @dt")
-        .query(f"{CLOSE_OUT_COLUMN} == 0")
-    )
+    qdf = xdf.query("conid.isin(@conids)").query("date_time < @dt").query(f"{CLOSE_OUT_COLUMN} == 0")
     return qdf.head(1)
 
 

@@ -38,9 +38,7 @@ class TradeListView(LoginRequiredMixin, ListView):
     paginate_by = 500
 
     def get_queryset(self):
-        return (
-            super().get_queryset().prefetch_related("groupings").order_by("-date_time")
-        )
+        return super().get_queryset().prefetch_related("groupings").order_by("-date_time")
 
 
 class TradeUpdateView(LoginRequiredMixin, UpdateView):
@@ -70,18 +68,14 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
             Trade.objects.prefetch_related("groupings")
             .filter(groupings=self.object)
             .annotate(
-                fifo_pnl_realized_cumsum=Window(
-                    Sum("fifo_pnl_realized"), order_by=F("date_time").asc()
-                )
+                fifo_pnl_realized_cumsum=Window(Sum("fifo_pnl_realized"), order_by=F("date_time").asc())
             )
             .all()
             .order_by("-date_time")
         )
 
     def get_position_list(self):
-        transaction_ids = Trade.objects.filter(groupings=self.object).values_list(
-            "  ", flat=True
-        )
+        transaction_ids = Trade.objects.filter(groupings=self.object).values_list("  ", flat=True)
 
         return (
             Position.objects.prefetch_related("groupings")

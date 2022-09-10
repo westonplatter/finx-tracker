@@ -40,9 +40,7 @@ class Grouping(models.Model):
         max_length=16, choices=GroupingStatuses.choices, default=GroupingStatuses.ACTIVE
     )
 
-    trades = models.ManyToManyField(
-        to="trades.Trade", through="portfolios.GroupingTrade"
-    )
+    trades = models.ManyToManyField(to="trades.Trade", through="portfolios.GroupingTrade")
 
 
 class GroupingTrade(models.Model):

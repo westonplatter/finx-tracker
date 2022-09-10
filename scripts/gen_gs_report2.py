@@ -140,14 +140,10 @@ def classify_strategy(grouped_df):
 
 
 def is_rolling_trade(df: pd.DataFrame) -> bool:
-    return ("O" in df["open_close_indicator"].values) and (
-        "C" in df["open_close_indicator"].values
-    )
+    return ("O" in df["open_close_indicator"].values) and ("C" in df["open_close_indicator"].values)
 
 
-def find_roll_id_for_conids_and_dt(
-    df: pd.DataFrame, conids: List, dt: pd.Timestamp
-) -> pd.DataFrame:
+def find_roll_id_for_conids_and_dt(df: pd.DataFrame, conids: List, dt: pd.Timestamp) -> pd.DataFrame:
     df = (
         df.query("conid.isin(@conids)")
         .query("date_time < @dt")
@@ -221,9 +217,7 @@ def run():
         # only closing trades
         if row.open_close_indicator == "O":
             continue
-        single_opening_trade = find_opening_trade_fifo(
-            opening_trades, row.conid, row.date_time
-        )
+        single_opening_trade = find_opening_trade_fifo(opening_trades, row.conid, row.date_time)
         if len(single_opening_trade.index) >= 1:
             if len(single_opening_trade.index) > 1:
                 import pdb

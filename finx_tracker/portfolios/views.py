@@ -84,7 +84,7 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         )
 
     def get_position_list(self):
-        transaction_ids = Trade.objects.filter(groupings=self.object).values_list("  ", flat=True)
+        transaction_ids = Trade.objects.filter(groupings=self.object).values_list("transaction_id", flat=True)
 
         return (
             Position.objects.prefetch_related("groupings")

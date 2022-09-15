@@ -3,7 +3,7 @@
 {% load humanize %}
 
 {% block content %}
-<h1>Pnl</h2>
+<h1>Profit and Loss</h2>
 
 <table class="table">
   <tr>
@@ -24,7 +24,11 @@
     <td>{{ row.account_id }}</td>
     <td>{{ row.strategy_key }}</td>
     <td>{{ row.strategy_description }}</td>
-    <td><a href="{% url 'portfolios:grouping-detail' row.grouping_id %}">{{ row.grouping_name }}</a></td>
+    <td>
+      {% if row.grouping_id %}
+        <a href="{% url 'portfolios:grouping-detail' row.grouping_id %}">{{ row.grouping_name }}</a>
+      {% endif %}
+    </td>
     <td>{{ row.grouping_status }}</td>
     <td>{{ row.realized_pnl |floatformat:2|intcomma }}</td>
     <td>{{ row.unrealized_pnl |floatformat:2|intcomma }}</td>

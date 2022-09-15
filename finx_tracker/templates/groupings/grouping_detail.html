@@ -16,6 +16,7 @@
   <tr>
     <th>Conid</th>
     <th>Description</th>
+    <th>Position</th>
     <th>PnL Unrealized</th>
   </tr>
 
@@ -23,6 +24,7 @@
   <tr>
     <td>{{ position.conid }}</td>
     <td>{{ position.description }}</td>
+    <td>{{ position.position }}</td>
     <td>{{ position.fifo_pnl_unrealized }}</td>
   </tr>
   {% endfor %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Groupings</h2>
+
+<table class="table">
+  <tr>
+    <th>Account</th>
+    <th>Strategy Key</th>
+    <th>Strategy Desc</th>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Status</th>
+  </tr>
+
+  {% for grouping in object_list %}
+  <tr>
+    <td>{{ grouping.strategy.portfolio.account_id }}</td>
+    <td>{{ grouping.strategy.key }}</td>
+    <td>{{ grouping.strategy.description }}</td>
+    <td>{{ grouping.id }}</td>
+    <td>{{ grouping.name }}</td>
+    <td>{{ grouping.status }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+{%endblock %}

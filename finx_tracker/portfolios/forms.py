@@ -28,3 +28,15 @@ class TradeForm(forms.ModelForm):
             required=False,
             label="",
         )
+
+
+class GroupingForm(forms.ModelForm):
+    class Meta:
+        model = Grouping
+        fields = ["name", "status"]
+
+    def __init__(self, *args, **kwargs):
+        super(GroupingForm, self).__init__(*args, **kwargs)
+
+        self.fields["name"].label = ""
+        self.fields["status"].label = ""

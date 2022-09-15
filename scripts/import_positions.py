@@ -3,6 +3,7 @@ import os
 from typing import List
 
 import pandas as pd
+import sqlalchemy as sa
 from sqlalchemy import create_engine
 
 from finx_tracker.portfolios.models import Portfolio, Position
@@ -57,9 +58,11 @@ def append_to_table(engine, df, table_name):
         df.to_sql(table_name, con=con, if_exists="append", index=False)
 
 
-def truncate_table(engine):
+def truncate_table(engine, account_id: str):
     with engine.connect() as con:
-        con.execute(f"TRUNCATE {POSITIONS_TABLE_NAME}; ")
+        query = sa.text("DELETE FROM portfolios_position WHERE account_id = :account_id;")
+        stmt = query.bindparams(account_id=account_id)
+        con.execute(stmt)
 
 
 def persist_portfolios_to_db(df):
@@ -74,9 +77,10 @@ def persist_portfolios_to_db(df):
 def run():
     db_url = gen_db_url()
     engine = create_engine(db_url)
-    truncate_table(engine)
     for file in fetch_files_from_disk():
-        df = pd.read_csv(file)
-        transform_df(df)
-        persist_portfolios_to_db(df)
-        append_to_table(engine, df, POSITIONS_TABLE_NAME)
+        file_df = pd.read_csv(file)
+        transform_df(file_df)
+        for account_id, df in file_df.groupby("account_id"):
+            truncate_table(engine, account_id=account_id)
+            persist_portfolios_to_db(df)
+            append_to_table(engine, df, POSITIONS_TABLE_NAME)

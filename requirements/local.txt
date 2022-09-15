@@ -10,12 +10,12 @@ watchgod==0.8.2  # https://github.com/samuelcolvin/watchgod
 mypy==0.950  # https://github.com/python/mypy
 django-stubs  # https://github.com/typeddjango/django-stubs
 pytest==7.1.2  # https://github.com/pytest-dev/pytest
-pytest-sugar==0.9.4  # https://github.com/Frozenball/pytest-sugar
+pytest-sugar==0.9.5  # https://github.com/Frozenball/pytest-sugar
 djangorestframework-stubs==1.7.0  # https://github.com/typeddjango/djangorestframework-stubs
 
 # Documentation
 # ------------------------------------------------------------------------------
-sphinx==4.5.0  # https://github.com/sphinx-doc/sphinx
+sphinx==5.1.1  # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild==2021.3.14 # https://github.com/GaretJax/sphinx-autobuild
 
 # Code quality
@@ -34,5 +34,5 @@ factory-boy==3.2.1  # https://github.com/FactoryBoy/factory_boy
 
 django-debug-toolbar==3.6.0  # https://github.com/jazzband/django-debug-toolbar
 django-extensions==3.1.5  # https://github.com/django-extensions/django-extensions
-django-coverage-plugin==2.0.2  # https://github.com/nedbat/django_coverage_plugin
+django-coverage-plugin==2.0.3  # https://github.com/nedbat/django_coverage_plugin
 pytest-django==4.5.2  # https://github.com/pytest-dev/pytest-django

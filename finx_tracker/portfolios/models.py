@@ -13,7 +13,6 @@ class Portfolio(models.Model):
     account_id = models.TextField(blank=True, null=True)
     acct_alias = models.FloatField(blank=True, null=True)
 
-
 class Strategy(models.Model):
     class Meta:
         managed = True
@@ -63,7 +62,9 @@ class Position(models.Model):
         db_table = "portfolios_position"
         managed = False
 
-    portfolio = ForeignKey(to=Portfolio, on_delete=models.CASCADE)
+    originating_transaction_id = models.IntegerField(primary_key=True)
+
+    # portfolio = ForeignKey(to=Portfolio, on_delete=models.CASCADE, to_field='account_id')
 
     account_id = models.TextField(blank=True, null=True)
     symbol = models.TextField(blank=True, null=True)
@@ -78,4 +79,5 @@ class Position(models.Model):
     cost_basis_money = models.FloatField(blank=True, null=True)
     fifo_pnl_unrealized = models.FloatField(blank=True, null=True)
 
-    originating_transaction_id = models.IntegerField(blank=False, null=False)
+
+    originating_order_id = models.IntegerField(blank=False, null=False)

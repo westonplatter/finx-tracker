@@ -7,6 +7,10 @@ docker.build:
 docker.up.django:
 	docker-compose -f local.yml up django
 
+docker.django-cli:
+	docker-compose -f local.yml run django-cli python manage.py shell
+
+
 import.positions:
 	cp ../finx-reports-ib/data/*_open_positions.csv data
 	docker-compose -f local.yml run django-cli python manage.py runscript import_positions

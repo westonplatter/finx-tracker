@@ -68,6 +68,18 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
         return qs.values("id")
 
 
+class GroupingListView(LoginRequiredMixin, ListView):
+    model = Grouping
+    template_name = "portfolios/grouping_list.html"
+    paginate_by = 100
+
+    def get_queryset(self) -> QuerySet[T]:
+        qs = super().get_queryset()
+        qs = qs.prefetch_related("strategy__portfolio")
+        qs = qs.order_by("strategy__portfolio__account_id", "status", "name")
+        return qs
+
+
 class GroupingDetailView(LoginRequiredMixin, DetailView):
     model = Grouping
     template_name = "groupings/grouping_detail.html"
@@ -89,7 +101,7 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         return (
             Position.objects.prefetch_related("groupings")
             .filter(originating_transaction_id__in=transaction_ids)
-            .values("conid", "symbol", "description", "fifo_pnl_unrealized")
+            .values("conid", "symbol", "description", "fifo_pnl_unrealized", "position")
         )
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

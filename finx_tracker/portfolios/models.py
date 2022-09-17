@@ -72,8 +72,7 @@ class Position(models.Model):
     conid = models.IntegerField(blank=False, null=False)
 
     position = models.IntegerField(blank=True, null=True)
-    mark_value = models.FloatField(blank=True, null=True)
-    mark_value = models.FloatField(blank=True, null=True)
+    mark_price = models.FloatField(blank=True, null=True)
     open_price = models.FloatField(blank=True, null=True)
     cost_basis = models.FloatField(blank=True, null=True)
     cost_basis_money = models.FloatField(blank=True, null=True)

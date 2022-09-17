@@ -54,7 +54,7 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "portfolios/trade_form.html"
     slug_field = "trade_id"
     slug_url_kwarg = "trade_id"
-    success_url = reverse_lazy("portfolios:trades-list")
+    success_url = reverse_lazy("portfolios:trade-list")
     form_class = TradeForm
 
     def get_form_kwargs(self) -> Dict[str, Any]:
@@ -101,7 +101,7 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         return (
             Position.objects.prefetch_related("groupings")
             .filter(originating_transaction_id__in=transaction_ids)
-            .values("conid", "symbol", "description", "fifo_pnl_unrealized", "position")
+            .values("conid", "symbol", "description", "fifo_pnl_unrealized", "position", "mark_price")
         )
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

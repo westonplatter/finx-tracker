@@ -6,12 +6,21 @@ from finx_tracker.trades.models import Trade
 
 
 class Portfolio(models.Model):
+    account_id = models.TextField(blank=True, null=True)
+    acct_alias = models.FloatField(blank=True, null=True)
+    finx_account_name = models.TextField(blank=True, null=True)
+
     class Meta:
         managed = True
         db_table = "portfolios_portfolio"
 
-    account_id = models.TextField(blank=True, null=True)
-    acct_alias = models.FloatField(blank=True, null=True)
+    def __str__(self):
+        if self.finx_account_name is None:
+            return f"{self.account_id}"
+        else:
+            return f"{self.account_id} / {self.finx_account_name}"
+
+
 
 class Strategy(models.Model):
     class Meta:
@@ -24,10 +33,6 @@ class Strategy(models.Model):
 
 
 class Grouping(models.Model):
-    class Meta:
-        managed = True
-        db_table = "portfolios_grouping"
-
     class GroupingStatuses(models.TextChoices):
         ACTIVE = "active", _("Active")
         CLOSED = "closed", _("Closed")
@@ -38,15 +43,14 @@ class Grouping(models.Model):
     status = models.CharField(
         max_length=16, choices=GroupingStatuses.choices, default=GroupingStatuses.ACTIVE
     )
-
     trades = models.ManyToManyField(to="trades.Trade", through="portfolios.GroupingTrade")
+
+    class Meta:
+        managed = True
+        db_table = "portfolios_grouping"
 
 
 class GroupingTrade(models.Model):
-    class Meta:
-        managed = True
-        db_table = "portfolios_grouping_trade"
-
     trade = ForeignKey(
         null=True,
         blank=True,
@@ -55,6 +59,9 @@ class GroupingTrade(models.Model):
         on_delete=models.CASCADE,
     )
     group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=models.CASCADE)
+    class Meta:
+        managed = True
+        db_table = "portfolios_grouping_trade"
 
 
 class Position(models.Model):
@@ -77,6 +84,5 @@ class Position(models.Model):
     cost_basis = models.FloatField(blank=True, null=True)
     cost_basis_money = models.FloatField(blank=True, null=True)
     fifo_pnl_unrealized = models.FloatField(blank=True, null=True)
-
 
     originating_order_id = models.IntegerField(blank=False, null=False)

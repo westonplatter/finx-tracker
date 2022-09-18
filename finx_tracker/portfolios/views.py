@@ -6,12 +6,12 @@ from django.db.models import F, Sum, Window
 from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, CreateView
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.filters import TradeListFilterSet
-from finx_tracker.portfolios.forms import TradeForm
-from finx_tracker.portfolios.models import Grouping, Portfolio, Position
+from finx_tracker.portfolios.forms import TradeForm, GroupingFormSet
+from finx_tracker.portfolios.models import Grouping, Portfolio, Position, Strategy
 from finx_tracker.trades.models import Trade
 
 
@@ -25,7 +25,8 @@ class PortfolioDetailView(LoginRequiredMixin, DetailView):
 class PortfolioListView(LoginRequiredMixin, ListView):
     # https://docs.djangoproject.com/en/4.1/ref/class-based-views/generic-display/#listview
     model = Portfolio
-    paginate_by = 100  # if pagination is desired
+    paginate_by = 10
+    ordering = ["account_id"]
 
 
 class PortfolioPnlView(LoginRequiredMixin, ListView):
@@ -109,3 +110,38 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         context_data["trade_list"] = self.get_trade_list()
         context_data["position_list"] = self.get_position_list()
         return context_data
+
+
+
+class StrategyCreateView(LoginRequiredMixin, CreateView):
+    model = Strategy
+    fields = ["key", "description", "portfolio"]
+    template_name: str = "portfolios/strategy_form.html"
+
+    def get_initial(self) -> Dict[str, Any]:
+        initial = super().get_initial()
+        initial["name"] = None
+        return initial
+
+    def get_context_data(self, **kwargs):
+        # we need to overwrite get_context_data
+        # to make sure that our formset is rendered
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data["groupings"] = GroupingFormSet(self.request.POST)
+        else:
+            data["groupings"] = GroupingFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        groupings = context["groupings"]
+        self.object = form.save()
+        if groupings.is_valid():
+            groupings.instance = self.object
+            groupings.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("portfolios:grouping-list")
+

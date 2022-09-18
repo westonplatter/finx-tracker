@@ -6,6 +6,7 @@ from finx_tracker.portfolios.views import (
     PortfolioDetailView,
     PortfolioListView,
     PortfolioPnlView,
+    StrategyCreateView,
     TradeListView,
     TradeUpdateView,
 )
@@ -20,4 +21,5 @@ urlpatterns = [
     path("trades/<int:trade_id>", view=TradeUpdateView.as_view(), name="trade-update"),
     path("groupings/<int:pk>/", view=GroupingDetailView.as_view(), name="grouping-detail"),
     path("groupings/", view=GroupingListView.as_view(), name="grouping-list"),
+    path("strategies/new", view=StrategyCreateView.as_view(), name="strategy-new"),
 ]

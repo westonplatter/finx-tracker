@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import inlineformset_factory
 
-from finx_tracker.portfolios.models import Grouping, Strategy, Trade
+from finx_tracker.portfolios.models import Grouping, Trade
 
 
 class GroupingNameChoiceField(forms.ModelMultipleChoiceField):
@@ -41,8 +41,3 @@ class GroupingForm(forms.ModelForm):
 
         self.fields["name"].label = ""
         self.fields["status"].label = ""
-
-
-GroupingFormSet = inlineformset_factory(
-    Strategy, Grouping, fields=("name", "status"), extra=1, can_delete=True
-)

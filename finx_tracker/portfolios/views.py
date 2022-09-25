@@ -110,3 +110,38 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         context_data["trade_list"] = self.get_trade_list()
         context_data["position_list"] = self.get_position_list()
         return context_data
+
+
+
+class StrategyCreateView(LoginRequiredMixin, CreateView):
+    model = Strategy
+    fields = ["key", "description", "portfolio"]
+    template_name: str = "portfolios/strategy_form.html"
+
+    def get_initial(self) -> Dict[str, Any]:
+        initial = super().get_initial()
+        initial["name"] = None
+        return initial
+
+    def get_context_data(self, **kwargs):
+        # we need to overwrite get_context_data
+        # to make sure that our formset is rendered
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data["groupings"] = GroupingFormSet(self.request.POST)
+        else:
+            data["groupings"] = GroupingFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        groupings = context["groupings"]
+        self.object = form.save()
+        if groupings.is_valid():
+            groupings.instance = self.object
+            groupings.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("portfolios:grouping-list")
+

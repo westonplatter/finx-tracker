@@ -59,6 +59,10 @@ class GroupingTrade(models.Model):
     )
     group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=models.CASCADE)
 
+    class Meta:
+        managed = True
+        db_table = "portfolios_grouping_trade"
+
 
 class Position(models.Model):
     class Meta:

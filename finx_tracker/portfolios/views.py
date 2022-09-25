@@ -6,11 +6,11 @@ from django.db.models import F, Sum, Window
 from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, UpdateView, CreateView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.filters import TradeListFilterSet
-from finx_tracker.portfolios.forms import TradeForm, GroupingFormSet
+from finx_tracker.portfolios.forms import GroupingFormSet, TradeForm
 from finx_tracker.portfolios.models import Grouping, Portfolio, Position, Strategy
 from finx_tracker.trades.models import Trade
 
@@ -112,7 +112,6 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         return context_data
 
 
-
 class StrategyCreateView(LoginRequiredMixin, CreateView):
     model = Strategy
     fields = ["key", "description", "portfolio"]
@@ -144,4 +143,3 @@ class StrategyCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy("portfolios:grouping-list")
-

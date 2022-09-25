@@ -21,7 +21,6 @@ class Portfolio(models.Model):
             return f"{self.account_id} / {self.finx_account_name}"
 
 
-
 class Strategy(models.Model):
     class Meta:
         managed = True
@@ -59,6 +58,7 @@ class GroupingTrade(models.Model):
         on_delete=models.CASCADE,
     )
     group = ForeignKey(null=True, blank=True, to=Grouping, on_delete=models.CASCADE)
+
     class Meta:
         managed = True
         db_table = "portfolios_grouping_trade"

@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   # dependencies for building Python packages
   build-essential \
   # psycopg2 dependencies
-  libpq-dev
+  libpq-dev \
+  postgresql-client
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
@@ -39,6 +40,7 @@ WORKDIR ${APP_HOME}
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
+  postgresql-client \
   # Translations dependencies
   gettext \
   # cleaning up unused files

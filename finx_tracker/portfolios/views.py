@@ -112,6 +112,7 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         return context_data
 
 
+
 class StrategyCreateView(LoginRequiredMixin, CreateView):
     model = Strategy
     fields = ["key", "description", "portfolio"]
@@ -143,3 +144,4 @@ class StrategyCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy("portfolios:grouping-list")
+

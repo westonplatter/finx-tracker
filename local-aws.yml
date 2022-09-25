@@ -17,8 +17,8 @@ services:
     volumes:
       - .:/app:z
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.envs/.local.aws/.django
+      - ./.envs/.local.aws/.postgres
     ports:
       - "8000:8000"
     command: /start
@@ -36,25 +36,25 @@ services:
     volumes:
       - .:/app:z
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.envs/.local.aws/.django
+      - ./.envs/.local.aws/.postgres
     ports:
       - "8000:8000"
     command: python
 
-  postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: finx_tracker_production_postgres
-    container_name: finx_tracker_local_postgres
-    volumes:
-      - finx_tracker_local_postgres_data:/var/lib/postgresql/data:Z
-      - finx_tracker_local_postgres_data_backups:/backups:z
-    env_file:
-      - ./.envs/.local/.postgres
-    ports:
-      - "5432:5432"
+  # postgres:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/production/postgres/Dockerfile
+  #   image: finx_tracker_production_postgres
+  #   container_name: finx_tracker_local_postgres
+  #   volumes:
+  #     - finx_tracker_local_postgres_data:/var/lib/postgresql/data:Z
+  #     - finx_tracker_local_postgres_data_backups:/backups:z
+  #   env_file:
+  #     - ./.envs/.local/.postgres
+  #   ports:
+  #     - "5432:5432"
 
   redis:
     image: redis:6

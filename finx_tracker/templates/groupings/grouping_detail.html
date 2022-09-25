@@ -18,6 +18,7 @@
     <th>Description</th>
     <th>Position</th>
     <th>PnL Unrealized</th>
+    <th>Mark Price</th>
   </tr>
 
   {% for position in position_list %}
@@ -26,6 +27,7 @@
     <td>{{ position.description }}</td>
     <td>{{ position.position }}</td>
     <td>{{ position.fifo_pnl_unrealized }}</td>
+    <td>{{ position.mark_price }}</td>
   </tr>
   {% endfor %}
 </table>
@@ -43,6 +45,8 @@
     <th>Realized PnL</th>
     <th>Realized PnL Cumulative</th>
     <th>O/C</th>
+    <th>Quantity</th>
+    <th>Price</th>
   </tr>
 
   {% for trade in trade_list %}
@@ -54,6 +58,8 @@
     <td>{{ trade.fifo_pnl_realized|floatformat:2|intcomma }}</td>
     <td>{{ trade.fifo_pnl_realized_cumsum|floatformat:2|intcomma }}</td>
     <td>{{ trade.open_close_indicator }}</td>
+    <td>{{ trade.quantity }}</td>
+    <td>{{ trade.trade_price }}</td>
   </tr>
   {% endfor %}
 </table>

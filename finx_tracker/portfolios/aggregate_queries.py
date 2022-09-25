@@ -24,7 +24,8 @@ def agg_query_strategy_pnl():
             , pg.status AS grouping_status
             , sum(t.fifo_pnl_realized) AS realized_pnl
             , sum(pp.fifo_pnl_unrealized) AS unrealized_pnl
-            , sum(pp.position_value) AS position_value
+            , sum(pp.position_value) AS net_position_value
+            , sum(abs(pp.position_value)) AS gross_position_value
             , sum(t.fifo_pnl_realized) + sum(pp.fifo_pnl_unrealized) AS total_pnl
             -- TODO calc percent of unrealized vs realized vs cost basis (helpful for rolling option positions)
 
@@ -43,8 +44,8 @@ def agg_query_strategy_pnl():
 
         order by
             t.account_id
-            , ps.key
-            , pg.id
+            , pg.status
+            , pg.name
         ;
     """
     with connection.cursor() as cursor:

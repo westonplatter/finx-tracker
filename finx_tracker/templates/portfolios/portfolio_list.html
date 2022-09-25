@@ -6,11 +6,13 @@
 <table class="table">
   <tr>
     <th>Account Id</th>
+    <th>Finx Account Name</th>
   </tr>
 
   {% for port in object_list %}
   <tr>
     <td>{{ port.account_id }}</td>
+    <td>{{ port.finx_account_name }}</td>
   </tr>
   {% endfor %}
 </table>

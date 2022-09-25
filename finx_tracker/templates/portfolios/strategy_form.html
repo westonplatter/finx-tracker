@@ -1,0 +1,8 @@
+<h1>Strategy</h1>
+
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <h2>Groupings</h2>
+    {{ groupings.as_p }}
+    <input type="submit" value="Save">
+</form>

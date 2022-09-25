@@ -5,20 +5,26 @@
 {% block content %}
 <h1>Profit and Loss</h2>
 
-<table class="table">
-  <tr>
-    <th>AccountId</th>
-    <th>Strat Key</th>
-    <th>Strat Desc</th>
-    <th>G Name</th>
-    <th>G Status</th>
-    <th>G Realized PnL</th>
-    <th>G Unrealized PnL</th>
-    <th>G Total Pnl</th>
-    <th>G Position Value</th>
-
-  </tr>
-
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th scope="col" colspan="1">Account</th>
+      <th scope="col" colspan="2">Strategy</th>
+      <th scope="col" colspan="7">Grouping</th>
+    </tr>
+    <tr>
+      <th scope="row">AccountId</th>
+      <th>Key</th>
+      <th>Desc</th>
+      <th>Name</th>
+      <th>Status</th>
+      <th>Realized PnL</th>
+      <th>Unrealized PnL</th>
+      <th>Total Pnl</th>
+      <th>Gross Value</th>
+      <th>Net Value</th>
+    </tr>
+  </thead>
   {% for row in object_list %}
   <tr>
     <td>{{ row.account_id }}</td>
@@ -33,7 +39,8 @@
     <td>{{ row.realized_pnl |floatformat:2|intcomma }}</td>
     <td>{{ row.unrealized_pnl |floatformat:2|intcomma }}</td>
     <td>{{ row.total_pnl |floatformat:2|intcomma}}</td>
-    <td>{{ row.position_value |floatformat:2|intcomma}}</td>
+    <td>{{ row.gross_position_value |floatformat:2|intcomma}}</td>
+    <td>{{ row.net_position_value |floatformat:2|intcomma}}</td>
   </tr>
   {% endfor %}
 </table>

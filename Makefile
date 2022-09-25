@@ -24,3 +24,12 @@ db.migrate:
 
 db.makemigrations:
 	docker-compose -f local.yml run django-cli python manage.py makemigrations
+
+
+# dump data from aws db
+db.pg_dump:
+	docker-compose -f local-aws.yml run django-cli python manage.py runscript db_dump
+
+# import data into local db
+db.pg_restore:
+	docker-compose -f local.yml run django-cli python manage.py runscript db_import

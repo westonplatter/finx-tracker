@@ -54,10 +54,10 @@
   <tr>
     <th></th>
 
+    <th>Datetime</th>
     <th>Account Id</th>
     <th>Description</th>
     <th>Grouping Name</th>
-    <th>Datetime</th>
     <th>Quantity</th>
     <th>O/C</th>
     <th>Fifo PnL Realized</th>
@@ -67,10 +67,10 @@
   <tr>
     <td><a href="{% url 'portfolios:trade-update' trade.trade_id  %}">Detail</a></td>
 
+    <td>{{ trade.date_time }}</td>
     <td>{{ trade.account_id }}</td>
     <td>{{ trade.description }}</td>
     <td>{{ trade.groupings | render_grouping_names }}</td>
-    <td>{{ trade.date_time }}</td>
     <td>{{ trade.quantity }}</td>
     <td>{{ trade.open_close_indicator }}</td>
     <td>{{ trade.fifo_pnl_realized }}</td>

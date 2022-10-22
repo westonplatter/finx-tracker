@@ -61,6 +61,8 @@
     <th>Quantity</th>
     <th>O/C</th>
     <th>Fifo PnL Realized</th>
+    <th>Rank</th>
+    <th>Color</th>
   </tr>
 
   {% for trade in object_list %}
@@ -74,6 +76,8 @@
     <td>{{ trade.quantity }}</td>
     <td>{{ trade.open_close_indicator }}</td>
     <td>{{ trade.fifo_pnl_realized }}</td>
+    <td>{{ trade.rank }}</td>
+    <td>{{ trade.color }}</td>
   </tr>
   {% endfor %}
 </table>

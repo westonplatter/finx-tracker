@@ -15,9 +15,28 @@
     </ul>
   </p>
 
-  <form method="post">{% csrf_token %}
-      {{ form.as_p }}
-      <input type="submit" value="Update">
-  </form>
+  <p>
+    <form method="post">{% csrf_token %}
+      {% csrf_token %}
+      {% comment %} manually render form so we can edit the CSS and UX  {% endcomment %}
+      {{ form.non_field_errors }}
+
+      {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field.errors }}
+        {{ hidden_field }}
+      {% endfor %}
+
+      <div class="form-group">
+        <label>Trade Group</label>
+        <br/>
+        {{ form.groupings.errors }}
+        {{ form.groupings }}
+        {{ form.groupings.help_text }}
+      </div>
+
+      <br/>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </p>
 
 {% endblock %}

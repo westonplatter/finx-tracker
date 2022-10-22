@@ -7,6 +7,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.db.models.functions import Abs, Rank, RowNumber
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.filters import TradeListFilterSet
@@ -46,7 +47,12 @@ class TradeListView(LoginRequiredMixin, django_filters.views.FilterView):
     def get_queryset(self) -> QuerySet[T]:
         qs = super().get_queryset()  # to work with django-filters
         qs = qs.filter()  # TODO qs = qs.filter(user=self.request.user)
+        qs = qs.annotate(rank=Window(
+            expression=Rank(),
+            order_by=[F('date_time').desc(), F('open_close_indicator').asc()])
+        )
         qs = qs.prefetch_related("groupings")
+        # TODO - do this instead, https://stackoverflow.com/a/8678448/665578
         return qs
 
 

@@ -53,7 +53,6 @@
 <table class="table">
   <tr>
     <th></th>
-
     <th>Datetime</th>
     <th>Account Id</th>
     <th>Description</th>
@@ -61,24 +60,30 @@
     <th>Quantity</th>
     <th>O/C</th>
     <th>Fifo PnL Realized</th>
-    <th>Rank</th>
-    <th>Color</th>
+    <th>Grouped Trades</th>
   </tr>
 
-  {% for trade in object_list %}
-  <tr>
-    <td><a href="{% url 'portfolios:trade-update' trade.trade_id  %}">Detail</a></td>
+  {% regroup object_list by date_time as objects_list_by_date %}
 
-    <td>{{ trade.date_time }}</td>
-    <td>{{ trade.account_id }}</td>
-    <td>{{ trade.description }}</td>
-    <td>{{ trade.groupings | render_grouping_names }}</td>
-    <td>{{ trade.quantity }}</td>
-    <td>{{ trade.open_close_indicator }}</td>
-    <td>{{ trade.fifo_pnl_realized }}</td>
-    <td>{{ trade.rank }}</td>
-    <td>{{ trade.color }}</td>
-  </tr>
+  {% for date_time, trades in objects_list_by_date %}
+    {% for trade in trades %}
+      <tr>
+        <td><a href="{% url 'portfolios:trade-update' trade.id %}">Details</a></td>
+        <td>{{ trade.date_time }}</td>
+        <td>{{ trade.account_id }}</td>
+        <td>{{ trade.description }}</td>
+        <td>{{ trade.groupings | render_grouping_names }}</td>
+        <td>{{ trade.quantity }}</td>
+        <td>{{ trade.open_close_indicator }}</td>
+        <td>{{ trade.fifo_pnl_realized }}</td>
+        <td>
+          {% if trades|length > 1 %}
+            {{ trades|length }}
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </div>
   {% endfor %}
 </table>
 

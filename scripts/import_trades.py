@@ -10,6 +10,7 @@ from typing import List
 
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
 
 from finx_tracker.portfolios.models import Portfolio
 from finx_tracker.trades.models import Trade
@@ -31,14 +32,14 @@ def fetch_files_from_disk() -> List:
     return csv_files
 
 
-def transform_datetime_columns(df):
+def transform_datetime_columns(df: pd.DataFrame) -> pd.DataFrame:
     df["open_date_time"] = parse_datetime_series(df["open_date_time"])
     df["holding_period_date_time"] = parse_datetime_series(df["holding_period_date_time"])
     df["report_date"] = parse_date_series(df["report_date"])
     return df
 
 
-def transform_drop_columns(df):
+def transform_drop_columns(df: pd.DataFrame) -> pd.DataFrame:
     cols = [
         "unnamed: 0",
         "serial_number",
@@ -53,14 +54,15 @@ def transform_drop_columns(df):
     return df
 
 
-def transform_df(df):
+def transform_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply transforms to df"""
     df = transform_snake_case_names(df)
     df = transform_datetime_columns(df)
     df = transform_drop_columns(df)
     return df
 
 
-def remove_existing_trades(engine, df) -> pd.DataFrame:
+def remove_existing_trades(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
     query = f"select trade_id from {TRADES_TABLE_NAME}"
     with engine.connect() as con:
         existing_df = pd.read_sql(query, con=con)
@@ -69,12 +71,11 @@ def remove_existing_trades(engine, df) -> pd.DataFrame:
     return new_df
 
 
-def append_to_table(engine, df, table_name):
-    with engine.connect() as con:
-        df.to_sql(table_name, con=con, if_exists="append", index=False)
+def append_to_table(engine: Engine, df: pd.DataFrame, table_name: str) -> None:
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 
-def persist_portfolios_to_db(df):
+def persist_portfolios_to_db(df: pd.DataFrame) -> None:
     account_ids = df["account_id"].unique()
     for aid in account_ids:
         port = Portfolio.objects.filter(account_id=aid).first()
@@ -84,6 +85,7 @@ def persist_portfolios_to_db(df):
 
 
 def run():
+    """Run is the expected django scripts entry point"""
     db_url = gen_db_url()
     engine = create_engine(db_url)
     for file in fetch_files_from_disk():

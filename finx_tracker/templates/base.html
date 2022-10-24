@@ -1,5 +1,8 @@
-{% load static i18n compress%}<!DOCTYPE html>
+{% load static i18n compress%}
+
+<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
+
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
     <meta charset="utf-8">
@@ -13,7 +16,9 @@
 
     {% block css %}
     <!-- Latest compiled and minified Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha512-GQGU0fMMi238uA+a/bdWJfpUGKUkBdgfFdgBm72SUQ6BeyWjoY/ton0tEjH+OSH9iP4Dfh+7HM0I9f5eR0L/4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% comment %} version 5.2.2 {% endcomment %}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/bootstrap.min.css.map' %}" rel="application/octet-stream" />
     <!-- Your stuff: Third-party CSS libraries go here -->
 
     <!-- This file stores project-specific CSS -->
@@ -26,7 +31,9 @@
     {# Placed at the top of the document so pages load faster with defer #}
     {% block javascript %}
       <!-- Bootstrap JS -->
-      <script defer src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js" integrity="sha512-OvBgP9A2JBgiRad/mM36mkzXSXaJE9BEIENnVEmeZdITvwT09xnxLtT4twkCa8m/loMbPHsvPl0T8lRGVBwjlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      {% comment %} version 5.2.2 {% endcomment %}
+      <script defer src="{% static 'js/bootstrap.min.js' %}"></script>
+      <script defer src="{% static 'js/bootstrap.min.js.map' %}"></script>
       <!-- Your stuff: Third-party javascript libraries go here -->
 
       <!-- place project specific Javascript in this file -->

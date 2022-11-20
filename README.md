@@ -34,10 +34,19 @@ docker-compose -f local.yml run django-cli python manage.py runscript import_tra
 
 ### Importing positions
 Run this,
-```
-cp ../finx-ib-reports/data/* data
+
+```bash
+cp ../finx-reports-ib/data/* data
 docker-compose -f local.yml run django-cli python manage.py runscript import_positions
 ```
+
+### Running the UI
+Run this,
+
+```bash
+make docker.up.django
+```
+
 
 
 ### DB / Migrations 

@@ -46,23 +46,27 @@ def transform_drop_columns(df):
     return df
 
 
+def transform_cast_types(df):
+    df = df.astype({"code": str})
+    return df
+
+
 def transform_df(df):
     df = transform_snake_case_names(df)
     df = transform_datetime_columns(df)
     df = transform_drop_columns(df)
+    df = transform_cast_types(df)
     return df
 
 
 def append_to_table(engine, df, table_name):
-    with engine.connect() as con:
-        df.to_sql(table_name, con=con, if_exists="append", index=False)
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 
 def truncate_table(engine, account_id: str):
-    with engine.connect() as con:
-        query = sa.text("DELETE FROM portfolios_position WHERE account_id = :account_id;")
-        stmt = query.bindparams(account_id=account_id)
-        con.execute(stmt)
+    query = sa.text("DELETE FROM portfolios_position WHERE account_id = :account_id ;")
+    stmt = query.bindparams(account_id=account_id)
+    engine.execute(stmt)
 
 
 def persist_portfolios_to_db(df):

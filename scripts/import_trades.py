@@ -54,11 +54,17 @@ def transform_drop_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def transform_cast_types(df: pd.DataFrame) -> pd.DataFrame:
+    # placeholder
+    return df
+
+
 def transform_df(df: pd.DataFrame) -> pd.DataFrame:
     """Apply transforms to df"""
     df = transform_snake_case_names(df)
     df = transform_datetime_columns(df)
     df = transform_drop_columns(df)
+    df = transform_cast_types(df)
     return df
 
 

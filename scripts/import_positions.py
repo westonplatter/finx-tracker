@@ -64,6 +64,7 @@ def append_to_table(engine, df, table_name):
 
 
 def truncate_table(engine, account_id: str):
+    print(f"Truncating table for account_id: {account_id}")
     query = sa.text("DELETE FROM portfolios_position WHERE account_id = :account_id ;")
     stmt = query.bindparams(account_id=account_id)
     engine.execute(stmt)
@@ -72,6 +73,7 @@ def truncate_table(engine, account_id: str):
 def persist_portfolios_to_db(df):
     account_ids = df["account_id"].unique()
     for aid in account_ids:
+        print(f"Persisting positions for account_id: {aid}")
         port = Portfolio.objects.filter(account_id=aid).first()
         if port is None:
             port = Portfolio(account_id=aid)

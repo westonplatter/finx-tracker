@@ -16,7 +16,7 @@ services:
       - ./.envs/.local.aws/.django
       - ./.envs/.local.aws/.postgres
     ports:
-      - "8000:8000"
+      - 8000:8000
     command: /start
 
   django-cli:

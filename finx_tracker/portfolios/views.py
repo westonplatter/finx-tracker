@@ -16,6 +16,14 @@ from finx_tracker.portfolios.models import Grouping, Portfolio, Position, Strate
 from finx_tracker.trades.models import Trade
 
 
+from django.views.generic import View, TemplateView
+
+
+class BasicTextView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('http successful')
+
+
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
     # https://docs.djangoproject.com/en/4.1/ref/class-based-views/generic-display/#detailview
     model = Portfolio
@@ -56,7 +64,7 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "portfolios/trade_form.html"
     slug_field = "trade_id"
     slug_url_kwarg = "trade_id"
-    success_url = reverse_lazy("portfolios:trade-list")
+    success_url = reverse_lazy("portfolios:basic-text-response")
     form_class = TradeForm
 
     def get_form_kwargs(self) -> Dict[str, Any]:

@@ -9,6 +9,7 @@ from finx_tracker.portfolios.views import (
     StrategyCreateView,
     TradeListView,
     TradeUpdateView,
+    BasicTextView,
 )
 
 app_name = "portfolios"
@@ -22,4 +23,5 @@ urlpatterns = [
     path("groupings/<int:pk>/", view=GroupingDetailView.as_view(), name="grouping-detail"),
     path("groupings/", view=GroupingListView.as_view(), name="grouping-list"),
     path("strategies/new", view=StrategyCreateView.as_view(), name="strategy-new"),
+    path("basic_text_response", view=BasicTextView.as_view(), name="basic-text-response"),
 ]

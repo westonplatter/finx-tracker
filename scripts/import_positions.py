@@ -2,13 +2,12 @@ import glob
 import os
 from typing import List
 
+from finx_reports_ib.config_helpers import get_ib_json
+from finx_reports_ib.download_trades import fetch_report
+from finx_reports_ib.adapters import ReportOutputAdapterPandas
 import pandas as pd
 import sqlalchemy as sa
 from sqlalchemy import create_engine
-from finx_reports_ib.config_helpers import get_config, get_ib_json
-from finx_reports_ib.download_trades import fetch_report
-from finx_reports_ib.adapters import ReportOutputAdapterPandas
-from dotenv import load_dotenv
 
 from finx_tracker.portfolios.models import Portfolio, Position
 

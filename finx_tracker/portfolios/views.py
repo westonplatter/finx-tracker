@@ -3,17 +3,28 @@ from typing import Any, Dict, List, T
 import django_filters.views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Sum, Window
+from django.db.models.functions import Abs, Rank, RowNumber
 from django.db.models.query import QuerySet
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-from django.db.models.functions import Abs, Rank, RowNumber
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.filters import TradeListFilterSet
 from finx_tracker.portfolios.forms import GroupingFormSet, TradeForm
 from finx_tracker.portfolios.models import Grouping, Portfolio, Position, Strategy
 from finx_tracker.trades.models import Trade
+
+
+from django.shortcuts import render
+from django.views.generic import View, TemplateView
+from django.template import Context
+
+
+class BasicTextView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('http successful')
 
 
 class PortfolioDetailView(LoginRequiredMixin, DetailView):
@@ -56,7 +67,7 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "portfolios/trade_form.html"
     slug_field = "trade_id"
     slug_url_kwarg = "trade_id"
-    success_url = reverse_lazy("portfolios:trade-list")
+    success_url = reverse_lazy("portfolios:basic-text-response")
     form_class = TradeForm
 
     def get_form_kwargs(self) -> Dict[str, Any]:
@@ -68,6 +79,47 @@ class TradeUpdateView(LoginRequiredMixin, UpdateView):
     def possible_group_ids(account_id: str) -> List[str]:
         qs = Grouping.objects.filter(strategy__portfolio__account_id=account_id)
         return qs.values("id")
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+
+from django import forms
+class TradesMultipleForm(forms.Form):
+    trades = forms.ModelMultipleChoiceField(queryset=Trade.objects.all())
+    grouping = forms.ModelChoiceField(queryset=Grouping.objects.all())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        trades = cleaned_data.get("trades")
+        grouping = cleaned_data.get("grouping")
+        if trades and grouping:
+            for trade in trades:
+                trade.groupings.add(grouping)
+
+    def save(self):
+        pass
+        # self.cleaned_data["trades"].update(grouping=self.cleaned_data["grouping"])
+
+class TradesMultipleUpdateView(LoginRequiredMixin, TemplateView):
+    def get_get_context_data(self, *args, **kwargs):
+        context = super(TradesMultipleUpdateView, self).get_context_data(*args,**kwargs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_get_context_data(*args, **kwargs)
+
+        return render(request, "portfolios/trades_multiple_update.html", context)
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(*args, **kwargs)
+        return render(request, "portfolios/trades_multiple_update.html", context)
+
 
 
 class GroupingListView(LoginRequiredMixin, ListView):

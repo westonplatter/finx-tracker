@@ -13,6 +13,8 @@ This codebase aims to
 ### Getting started
 Tracker is built in with a soft linking data dependency to [finx-reports-ib](https://github.com/westonplatter/finx-reports-ib). The following scripted steps assume that it's setup in a adjacent directory. Checkout the `finx-reports-ib` for more info on it.
 
+NOTE - if using colima, https://smallsharpsoftwaretools.com/tutorials/use-colima-to-run-docker-containers-on-macos/
+
 ```
 mkdir -finx 
 cd finx
@@ -34,10 +36,19 @@ docker-compose -f local.yml run django-cli python manage.py runscript import_tra
 
 ### Importing positions
 Run this,
-```
-cp ../finx-ib-reports/data/* data
+
+```bash
+cp ../finx-reports-ib/data/* data
 docker-compose -f local.yml run django-cli python manage.py runscript import_positions
 ```
+
+### Running the UI
+Run this,
+
+```bash
+make docker.up.django
+```
+
 
 
 ### DB / Migrations 

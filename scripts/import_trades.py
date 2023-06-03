@@ -8,12 +8,17 @@ import glob
 import os
 from typing import List
 
+from finx_reports_ib.config_helpers import get_ib_json
+from finx_reports_ib.download_trades import fetch_report
+from finx_reports_ib.adapters import ReportOutputAdapterPandas
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
+
 from finx_tracker.portfolios.models import Portfolio
 from finx_tracker.trades.models import Trade
+
 
 from .common import (
     gen_db_url,
@@ -23,6 +28,43 @@ from .common import (
 )
 
 TRADES_TABLE_NAME = Trade._meta.db_table
+
+
+def fetch_dfs_from_ibkr_flex_report() -> List[pd.DataFrame]:
+    """
+    Fetches trades from IBKR's FlexQuery API
+
+    Returns:
+        List[pd.DataFrame]: df with trades segmented by account_id
+    """
+    report_name = "weekly"
+
+    # configs = get_config(file_name)
+    configs = os.environ
+    data = get_ib_json(configs)
+
+    if "accounts" not in data:
+        return None
+
+    trade_dfs = []
+    for account in data["accounts"]:
+        # get query_id and flex_token from env var json
+        query_id = int(account[report_name.lower()])
+        if query_id <= 0:
+            print(f"{account['name']} does not have a {report_name} query_id")
+            continue
+        flex_token = account["flex_token"]
+
+        # fetch report from IBKR's FlexQuery API
+        report = fetch_report(flex_token, query_id, cache_report_on_disk=False)
+        output_adapter = ReportOutputAdapterPandas(report=report)
+        account_ids = report.account_ids()
+
+        # parsed each account's open positions into a df
+        for aid in account_ids:
+            trade_dfs.append(output_adapter.put_trades(aid=aid))
+
+    return trade_dfs
 
 
 def fetch_files_from_disk() -> List:
@@ -54,11 +96,19 @@ def transform_drop_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def transform_cast_types(df: pd.DataFrame) -> pd.DataFrame:
+    # placeholder
+    return df
+
+
 def transform_df(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply transforms to df"""
+    """
+    Apply transforms to df
+    """
     df = transform_snake_case_names(df)
     df = transform_datetime_columns(df)
     df = transform_drop_columns(df)
+    df = transform_cast_types(df)
     return df
 
 
@@ -85,11 +135,13 @@ def persist_portfolios_to_db(df: pd.DataFrame) -> None:
 
 
 def run():
-    """Run is the expected django scripts entry point"""
+    """
+    Run is the expected django scripts entry point
+    """
     db_url = gen_db_url()
     engine = create_engine(db_url)
-    for file in fetch_files_from_disk():
-        df = pd.read_csv(file)
+
+    for df in fetch_dfs_from_ibkr_flex_report():
         df = transform_df(df)
         persist_portfolios_to_db(df)
         new_df = remove_existing_trades(engine, df)

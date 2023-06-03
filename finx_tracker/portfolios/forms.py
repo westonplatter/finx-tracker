@@ -30,7 +30,6 @@ class TradeForm(forms.ModelForm):
             label="",
         )
 
-
 class GroupingForm(forms.ModelForm):
     class Meta:
         model = Grouping

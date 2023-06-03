@@ -63,12 +63,19 @@
     <th>Grouped Trades</th>
   </tr>
 
+
+  <form action="/portfolios/trades/multiple-update" method="get">
+    <input type="integer" name="your_name" value=123>
+    <input type="submit" value="OK">
+  </form>
+
+
   {% regroup object_list by date_time as objects_list_by_date %}
 
   {% for date_time, trades in objects_list_by_date %}
     {% for trade in trades %}
       <tr>
-        <td><a href="{% url 'portfolios:trade-update' trade.id %}">Details</a></td>
+        <td><a href="{% url 'portfolios:trade-update' trade.trade_id %}">Details</a></td>
         <td>{{ trade.date_time }}</td>
         <td>{{ trade.account_id }}</td>
         <td>{{ trade.description }}</td>

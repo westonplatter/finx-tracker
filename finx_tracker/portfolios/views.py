@@ -7,6 +7,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.db.models.functions import Abs, Rank, RowNumber
 
 from finx_tracker.portfolios.aggregate_queries import agg_query_strategy_pnl
 from finx_tracker.portfolios.filters import TradeListFilterSet
@@ -44,7 +45,7 @@ class TradeListView(LoginRequiredMixin, django_filters.views.FilterView):
     ordering = ["-date_time"]
 
     def get_queryset(self) -> QuerySet[T]:
-        qs = super().get_queryset()  # to work with django-filters
+        qs = super().get_queryset() # to work with django-filters
         qs = qs.filter()  # TODO qs = qs.filter(user=self.request.user)
         qs = qs.prefetch_related("groupings")
         return qs
@@ -112,7 +113,6 @@ class GroupingDetailView(LoginRequiredMixin, DetailView):
         return context_data
 
 
-
 class StrategyCreateView(LoginRequiredMixin, CreateView):
     model = Strategy
     fields = ["key", "description", "portfolio"]
@@ -144,4 +144,3 @@ class StrategyCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy("portfolios:grouping-list")
-

@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential \
   # psycopg2 dependencies
   libpq-dev \
-  postgresql-client
+  postgresql-client \
+  git
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
@@ -75,6 +76,7 @@ RUN chmod +x /start-celerybeat
 COPY ./compose/local/django/celery/flower/start /start-flower
 RUN sed -i 's/\r$//g' /start-flower
 RUN chmod +x /start-flower
+
 
 
 # copy application code to WORKDIR

@@ -20,6 +20,9 @@ docker.cleanup:
 docker.build:
 	docker-compose -f local-aws.yml build
 
+# docker.push:
+# 	docker-compose -f local-aws.yml build
+
 docker.up.django:
 	docker-compose -f local-aws.yml up django
 
@@ -28,12 +31,14 @@ docker.django-cli:
 
 ### development commands ######################################################
 
+docker.test:
+	docker-compose -f local.yml run django-cli python manage.py test
+
 db.migrate:
 	docker-compose -f local.yml run django-cli python manage.py migrate
 
 db.makemigrations:
 	docker-compose -f local.yml run django-cli python manage.py makemigrations
-
 
 # dump data from aws db
 db.pg_dump:

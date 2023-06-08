@@ -11,6 +11,8 @@ from typing import List
 from finx_reports_ib.config_helpers import get_ib_json
 from finx_reports_ib.download_trades import fetch_report
 from finx_reports_ib.adapters import ReportOutputAdapterPandas
+from loguru import logger
+import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
@@ -27,7 +29,7 @@ from .common import (
     transform_snake_case_names,
 )
 
-TRADES_TABLE_NAME = Trade._meta.db_table
+TRADES_TABLE_NAME = Trade._meta.db_table  # trunk-ignore(pylint/W0718)
 
 
 def fetch_dfs_from_ibkr_flex_report() -> List[pd.DataFrame]:
@@ -37,7 +39,7 @@ def fetch_dfs_from_ibkr_flex_report() -> List[pd.DataFrame]:
     Returns:
         List[pd.DataFrame]: df with trades segmented by account_id
     """
-    report_name = "weekly"
+    report_name = "annual"
 
     # configs = get_config(file_name)
     configs = os.environ
@@ -81,35 +83,48 @@ def transform_datetime_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def transform_drop_columns(df: pd.DataFrame) -> pd.DataFrame:
-    cols = [
-        "unnamed: 0",
-        "serial_number",
-        "delivery_type",
-        "commodity_type",
-        "fineness",
-        "weight",
-    ]
-    for col in cols:
-        if col in df.columns:
-            df.drop(columns=[col], inplace=True)
-    return df
+# def transform_drop_columns(df: pd.DataFrame) -> pd.DataFrame:
+#     cols = [
+#         "unnamed: 0",
+#         "serial_number",
+#         "delivery_type",
+#         "commodity_type",
+#         "fineness",
+#         "weight",
+#     ]
+#     for col in cols:
+#         if col in df.columns:
+#             df.drop(columns=[col], inplace=True)
+#     return df
 
 
 def transform_cast_types(df: pd.DataFrame) -> pd.DataFrame:
-    # placeholder
+    # place holder
     return df
 
 
 def transform_df(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Apply transforms to df
+    Apply transforms to df.
     """
     df = transform_snake_case_names(df)
     df = transform_datetime_columns(df)
-    df = transform_drop_columns(df)
     df = transform_cast_types(df)
     return df
+
+
+def validate_df_against(table_columns: List[str], df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Validate that the df has the same columns as the table.
+    """
+    df_columns = df.columns.tolist()
+    df_columns_not_in_table = [col for col in df_columns if col not in table_columns]
+
+    if len(df_columns_not_in_table) > 0:
+        df_columns = list(set(df_columns) - set(df_columns_not_in_table))
+        logger.warning(f"finx_report_ib returned columns not in table: {df_columns_not_in_table}")
+        logger.warning("They have been removed so that the df data can be persisted to DB.")
+    return df[df_columns].copy()
 
 
 def remove_existing_trades(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
@@ -136,13 +151,32 @@ def persist_portfolios_to_db(df: pd.DataFrame) -> None:
 
 def run():
     """
-    Run is the expected django scripts entry point
+    Run is the expected django scripts entry point.
     """
     db_url = gen_db_url()
     engine = create_engine(db_url)
+    table_columns = [x.name for x in Trade._meta.get_fields()]
 
     for df in fetch_dfs_from_ibkr_flex_report():
         df = transform_df(df)
-        persist_portfolios_to_db(df)
-        new_df = remove_existing_trades(engine, df)
-        append_to_table(engine, new_df, TRADES_TABLE_NAME)
+        df = validate_df_against(table_columns, df)
+
+        try:
+            persist_portfolios_to_db(df)
+            new_df = remove_existing_trades(engine, df)
+
+            # custom overrides hacking to make it work
+            new_df['exch_order_id'] = new_df['exch_order_id'].replace('N/A', None)
+            # new_df['strike'] = new_df['strike'].replace('', None)
+            new_df['principal_adjust_factor'] = new_df['principal_adjust_factor'].replace('', None)
+            float_fields = [x.name for x in Trade._meta.get_fields() if x.get_internal_type() == "FloatField"]
+            for field in float_fields:
+                new_df[field] = new_df[field].replace('', None)
+            new_df['orig_trade_id'] = new_df['orig_trade_id'].replace('', None)
+            # new_df.replace('', None)
+
+            append_to_table(engine, new_df, TRADES_TABLE_NAME)
+        except Exception as e:  # trunk-ignore(pylint/W0718)
+            account_id = df["account_id"].unique()
+            logger.info(f"Error importing trades for account_id: {account_id}")
+            logger.info(f"Error importing trades: {e}")

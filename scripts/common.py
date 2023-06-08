@@ -30,7 +30,7 @@ def parse_datetime_series(raw_series: pd.Series) -> pd.Series:
         series = pd.to_datetime(raw_series, errors="raise", format=FORMAT)
         series = series.dt.tz_localize(tz="US/Eastern")
         return series
-    except ValueError:
+    except (ValueError, TypeError):
         FORMAT = "%Y-%m-%d %H:%M:%S%z"
         series = pd.to_datetime(raw_series, errors="raise", format=FORMAT, utc=True)
         series = series.dt.tz_convert(tz="US/Eastern")

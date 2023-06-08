@@ -5,11 +5,9 @@ list:
 ### data import ###############################################################
 
 import.positions:
-	cp ../finx-reports-ib/data/*_open_positions.csv data
 	docker-compose -f local-aws.yml run django-cli python manage.py runscript import_positions
 
 import.trades:
-	cp ../finx-reports-ib/data/*_trades.csv data
 	docker-compose -f local-aws.yml run django-cli python manage.py runscript import_trades
 
 ### docker stuff ##############################################################
@@ -31,19 +29,30 @@ docker.django-cli:
 
 ### development commands ######################################################
 
-docker.test:
-	docker-compose -f local.yml run django-cli python manage.py test
+### aws
 
 db.migrate:
-	docker-compose -f local.yml run django-cli python manage.py migrate
+	docker-compose -f local-aws.yml run django-cli python manage.py migrate
 
 db.makemigrations:
-	docker-compose -f local.yml run django-cli python manage.py makemigrations
+	docker-compose -f local-aws.yml run django-cli python manage.py makemigrations
 
 # dump data from aws db
 db.pg_dump:
 	docker-compose -f local-aws.yml run django-cli python manage.py runscript db_dump
 
+
+### local
+
+local.docker.test:
+	docker-compose -f local.yml run django-cli python manage.py test
+
 # import data into local db
-db.pg_restore:
+local.db.pg_restore:
 	docker-compose -f local.yml run django-cli python manage.py runscript db_import
+
+local.db.migrate:
+	docker-compose -f local-aws.yml run django-cli python manage.py migrate
+
+local.db.makemigrations:
+	docker-compose -f local-aws.yml run django-cli python manage.py makemigrations

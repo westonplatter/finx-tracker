@@ -22,7 +22,7 @@ POSITIONS_TABLE_NAME = Position._meta.db_table
 
 
 def fetch_dfs_from_ibkr_flex_report() -> List[pd.DataFrame]:
-    report_name = "weekly"
+    report_name = "annual"
 
     # configs = get_config(file_name)
     configs = os.environ
@@ -128,12 +128,18 @@ def run():
     engine = create_engine(db_url)
 
     for open_positions_df in fetch_dfs_from_ibkr_flex_report():
-    # for file in fetch_files_from_disk():
+        try:
+            df = open_positions_df.copy()
+            df = transform_df(df)
 
-        df = open_positions_df.copy()
-        df = transform_df(df)
+            for account_id, gdf in df.groupby("account_id"):
+                truncate_table(engine, account_id=account_id)
+                persist_portfolios_to_db(gdf)
 
-        for account_id, df in df.groupby("account_id"):
-            truncate_table(engine, account_id=account_id)
-            persist_portfolios_to_db(df)
-            append_to_table(engine, df, POSITIONS_TABLE_NAME)
+                # replace empty strings with None
+                gdf = gdf.replace('', None)
+
+                append_to_table(engine, gdf, POSITIONS_TABLE_NAME)
+        except Exception:  # trunk-ignore(pylint/W0718)
+            print(f"Error persisting positions for account_id: {account_id}")
+            import pdb; pdb.set_trace()
